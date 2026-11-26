@@ -1,0 +1,449 @@
+import { useEffect, useMemo, useRef, useState } from 'react'
+import type { ReactNode } from 'react'
+import {
+  ArrowRight,
+  Check,
+  Copy,
+  Gauge,
+  RotateCcw,
+  Share2,
+  Shuffle,
+  Target,
+  Timer,
+} from 'lucide-react'
+import type { TestLang, TestMode, TestResult, TypingMethod } from '../types'
+import { useI18n } from '../i18n/I18nContext'
+import { compareChars, computeStats, performanceLevel, segment } from '../lib/typingEngine'
+import { anotherParagraph, pickText } from '../data/testTexts'
+import { saveTestResult } from '../lib/progress'
+import { Button, Card } from './ui'
+import { ProgressRing } from './ProgressRing'
+import { cn, formatDuration, formatNumber } from '../lib/utils'
+import { Seo } from './Seo'
+
+type Phase = 'config' | 'running' | 'finished'
+
+const DURATIONS = [60, 120, 180, 300, 600]
+const MODES: TestMode[] = ['timed', 'fixed', 'word', 'sentence', 'beginner', 'advanced']
+const METHODS: TypingMethod[] = ['avro', 'bijoy', 'english']
+
+const levelKey: Record<string, string> = {
+  excellent: 'test.performanceExcellent',
+  good: 'test.performanceGood',
+  average: 'test.performanceAverage',
+  needsWork: 'test.performanceNeedsWork',
+}
+
+export function TypingTest() {
+  const { t, lang } = useI18n()
+  const [phase, setPhase] = useState<Phase>('config')
+  const [testLang, setTestLang] = useState<TestLang>('bn')
+  const [method, setMethod] = useState<TypingMethod>('avro')
+  const [mode, setMode] = useState<TestMode>('timed')
+  const [durationSec, setDurationSec] = useState(60)
+  const [customMin, setCustomMin] = useState(5)
+  const [target, setTarget] = useState('')
+  const [input, setInput] = useState('')
+  const [elapsed, setElapsed] = useState(0)
+  const [result, setResult] = useState<TestResult | null>(null)
+  const [copied, setCopied] = useState(false)
+
+  const inputEl = useRef<HTMLTextAreaElement>(null)
+  const targetRef = useRef('')
+  const inputValRef = useRef('')
+  const elapsedRef = useRef(0)
+  const cfgRef = useRef({ testLang, method, mode, durationSec })
+
+  useEffect(() => {
+    cfgRef.current = { testLang, method, mode, durationSec }
+  }, [testLang, method, mode, durationSec])
+  useEffect(() => {
+    targetRef.current = target
+  }, [target])
+  useEffect(() => {
+    inputValRef.current = input
+  }, [input])
+  useEffect(() => {
+    elapsedRef.current = elapsed
+  }, [elapsed])
+
+  const isTimed = mode === 'timed'
+  const effectiveDuration = durationSec === 0 ? customMin * 60 : durationSec
+  const timeLeft = Math.max(0, effectiveDuration - elapsed)
+
+  const live = useMemo(
+    () => computeStats(target, input, elapsed || 0.001),
+    [target, input, elapsed],
+  )
+  const cmp = useMemo(() => compareChars(target, input), [target, input])
+  const typedCount = useMemo(() => segment(input).length, [input])
+
+  function focusInput() {
+    setTimeout(() => inputEl.current?.focus(), 0)
+  }
+
+  function start() {
+    const text = pickText(testLang, mode, effectiveDuration || 120)
+    targetRef.current = text
+    setTarget(text)
+    setInput('')
+    inputValRef.current = ''
+    setElapsed(0)
+    elapsedRef.current = 0
+    setResult(null)
+    setPhase('running')
+    focusInput()
+  }
+
+  function finish(elapsedVal: number) {
+    const ev = Math.max(elapsedVal, elapsedRef.current)
+    const stats = computeStats(targetRef.current, inputValRef.current, ev)
+    const cfg = cfgRef.current
+    const saved = saveTestResult({
+      lang: cfg.testLang,
+      method: cfg.method,
+      mode: cfg.mode,
+      durationSec: cfg.mode === 'timed' ? cfg.durationSec : Math.round(ev),
+      elapsedSec: Math.round(ev),
+      totalTyped: stats.totalTyped,
+      correct: stats.correct,
+      incorrect: stats.incorrect,
+      accuracy: stats.accuracy,
+      cpm: stats.cpm,
+      wpm: stats.wpm,
+      target: targetRef.current.slice(0, 160),
+    })
+    setResult(saved)
+    setPhase('finished')
+  }
+
+  useEffect(() => {
+    if (phase !== 'running') return
+    const id = setInterval(() => {
+      setElapsed((e) => {
+        const next = e + 0.2
+        if (cfgRef.current.mode === 'timed' && next >= cfgRef.current.durationSec) {
+          clearInterval(id)
+          finish(cfgRef.current.durationSec)
+          return cfgRef.current.durationSec
+        }
+        return next
+      })
+    }, 200)
+    return () => clearInterval(id)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase])
+
+  useEffect(() => {
+    if (phase !== 'running' || !target) return
+    const tgCount = segment(target).length
+    if (tgCount > 0 && typedCount >= tgCount) {
+      finish(elapsedRef.current)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [input, phase, target])
+
+  function restart() {
+    setInput('')
+    inputValRef.current = ''
+    setElapsed(0)
+    elapsedRef.current = 0
+    setResult(null)
+    setPhase('running')
+    focusInput()
+  }
+
+  function another() {
+    const text =
+      mode === 'fixed' || mode === 'timed'
+        ? anotherParagraph(testLang, target)
+        : pickText(testLang, mode, effectiveDuration || 120)
+    targetRef.current = text
+    setTarget(text)
+    setInput('')
+    inputValRef.current = ''
+    setElapsed(0)
+    elapsedRef.current = 0
+    setResult(null)
+    setPhase('running')
+    focusInput()
+  }
+
+  function summaryText(r: TestResult): string {
+    return [
+      `${t('brand.name')} — ${t('test.results')}`,
+      `${t('test.cpm')}: ${r.cpm}`,
+      `${t('test.wpm')}: ${r.wpm}`,
+      `${t('test.accuracy')}: ${r.accuracy}%`,
+      `${t('test.correctChars')}: ${r.correct} / ${t('test.incorrectChars')}: ${r.incorrect}`,
+      `${t('test.testDuration')}: ${formatDuration(r.elapsedSec)}`,
+    ].join('\n')
+  }
+
+  function doCopy() {
+    if (!result) return
+    navigator.clipboard?.writeText(summaryText(result)).then(() => {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 1500)
+    })
+  }
+
+  function doShare() {
+    if (!result) return
+    const text = summaryText(result)
+    if (navigator.share) {
+      navigator.share({ text }).catch(() => {})
+    } else {
+      doCopy()
+    }
+  }
+
+  if (phase === 'config') {
+    return (
+      <div className="container-page py-8">
+        <Seo title={`${t('test.title')} — ${t('brand.name')}`} description={t('test.subtitle')} />
+        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">{t('test.title')}</h1>
+        <p className="mt-2 text-slate-500 dark:text-slate-400">{t('test.subtitle')}</p>
+
+        <Card className="mt-6 space-y-5">
+          <Field label={t('test.language')}>
+            <Pills
+              value={testLang}
+              options={[
+                { v: 'bn', label: t('common.bangla') },
+                { v: 'en', label: t('common.english') },
+              ]}
+              onChange={(v) => setTestLang(v as TestLang)}
+            />
+          </Field>
+
+          <Field label={t('test.method')}>
+            <Pills
+              value={method}
+              options={METHODS.map((m) => ({
+                v: m,
+                label: m === 'avro' ? t('test.mAvro') : m === 'bijoy' ? t('test.mBijoy') : t('test.mEnglish'),
+              }))}
+              onChange={(v) => setMethod(v as TypingMethod)}
+            />
+            <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">{t('test.methodNote')}</p>
+          </Field>
+
+          <Field label={t('test.mode')}>
+            <Pills
+              value={mode}
+              options={MODES.map((m) => ({
+                v: m,
+                label: t(
+                  m === 'timed' ? 'test.modeTimed'
+                    : m === 'fixed' ? 'test.modeFixed'
+                      : m === 'word' ? 'test.modeWord'
+                        : m === 'sentence' ? 'test.modeSentence'
+                          : m === 'beginner' ? 'test.modeBeginner'
+                            : 'test.modeAdvanced',
+                ),
+              }))}
+              onChange={(v) => setMode(v as TestMode)}
+            />
+          </Field>
+
+          {isTimed && (
+            <Field label={t('test.duration')}>
+              <Pills
+                value={String(durationSec)}
+                options={[
+                  ...DURATIONS.map((d) => ({ v: String(d), label: formatDuration(d) })),
+                  { v: '0', label: t('test.dCustom') },
+                ]}
+                onChange={(v) => setDurationSec(Number(v))}
+              />
+              {durationSec === 0 && (
+                <div className="mt-2 flex items-center gap-2">
+                  <label className="text-sm text-slate-500">{t('test.customMin')}</label>
+                  <input
+                    type="number"
+                    min={1}
+                    max={60}
+                    className="input w-24"
+                    value={customMin}
+                    onChange={(e) => setCustomMin(Number(e.target.value) || 1)}
+                    placeholder={t('test.customPlaceholder')}
+                  />
+                </div>
+              )}
+            </Field>
+          )}
+
+          <Button onClick={start} className="w-full sm:w-auto">
+            {t('test.start')} <ArrowRight size={16} />
+          </Button>
+        </Card>
+
+        {testLang === 'bn' && (
+          <p className="mt-4 rounded-lg bg-brand-50 p-3 text-xs text-brand-800 dark:bg-brand-900/30 dark:text-brand-200">
+            {t('test.banglaCpmNote')}
+          </p>
+        )}
+      </div>
+    )
+  }
+
+  if (phase === 'running') {
+    const progress = isTimed ? (elapsed / effectiveDuration) * 100 : (typedCount / Math.max(1, segment(target).length)) * 100
+    return (
+      <div className="container-page py-6">
+        <div className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <Stat icon={<Timer size={16} />} label={isTimed ? t('test.timeLeft') : t('test.progress')} value={isTimed ? formatDuration(timeLeft) : `${Math.round(progress)}%`} />
+          <Stat icon={<Gauge size={16} />} label={t('test.cpm')} value={formatNumber(live.cpm)} />
+          <Stat icon={<Gauge size={16} />} label={t('test.wpm')} value={formatNumber(live.wpm)} />
+          <Stat icon={<Target size={16} />} label={t('test.accuracy')} value={`${Math.round(live.accuracy)}%`} />
+        </div>
+
+        <div
+          className="cursor-text rounded-xl border border-slate-200 bg-white p-5 text-lg leading-relaxed shadow-sm dark:border-slate-800 dark:bg-slate-900"
+          onClick={focusInput}
+          dir="ltr"
+        >
+          {cmp.map((c, i) => (
+            <span
+              key={i}
+              className={cn(
+                c.state === 'correct' && 'text-slate-800 dark:text-slate-100',
+                c.state === 'incorrect' && 'rounded bg-red-100 text-red-600 dark:bg-red-900/50 dark:text-red-300',
+                c.state === 'extra' && 'text-red-400 line-through',
+                c.state === 'pending' && 'text-slate-400 dark:text-slate-600',
+              )}
+            >
+              {c.target === ' ' ? '\u00A0' : c.target}
+              {i === typedCount && <span className="typing-cursor align-middle" />}
+            </span>
+          ))}
+        </div>
+
+        <textarea
+          ref={inputEl}
+          className="input mt-3 resize-none text-base"
+          rows={3}
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder={t('test.typeHere')}
+          spellCheck={false}
+          autoComplete="off"
+          autoCapitalize="off"
+          autoCorrect="off"
+          aria-label={t('test.typeHere')}
+        />
+
+        <div className="mt-3 flex justify-end">
+          <Button variant="outline" onClick={() => finish(elapsedRef.current)}>
+            {t('common.finish')}
+          </Button>
+        </div>
+      </div>
+    )
+  }
+
+  const r = result
+  if (!r) return null
+  const lvl = performanceLevel(r.cpm)
+  return (
+    <div className="container-page py-8">
+      <Seo title={`${t('test.results')} — ${t('brand.name')}`} />
+      <div className="mb-4 flex items-center gap-2 text-lg font-semibold">
+        <Check size={20} className="text-emerald-600" /> {t('test.finished')}
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-3">
+        <Card className="flex flex-col items-center justify-center">
+          <ProgressRing value={r.accuracy} label={`${Math.round(r.accuracy)}%`} sublabel={t('test.accuracy')} />
+        </Card>
+        <Card className="grid grid-cols-2 gap-3 sm:col-span-2">
+          <Stat icon={<Gauge size={16} />} label={t('test.cpm')} value={formatNumber(r.cpm)} big />
+          <Stat icon={<Gauge size={16} />} label={t('test.wpm')} value={formatNumber(r.wpm)} big />
+          <Stat icon={<Check size={16} />} label={t('test.correctChars')} value={formatNumber(r.correct)} />
+          <Stat icon={<Target size={16} />} label={t('test.incorrectChars')} value={formatNumber(r.incorrect)} />
+          <Stat icon={<Timer size={16} />} label={t('test.testDuration')} value={formatDuration(r.elapsedSec)} />
+          <Stat icon={<Target size={16} />} label={t('test.totalChars')} value={formatNumber(r.totalTyped)} />
+        </Card>
+      </div>
+
+      <div className="mt-4 rounded-lg bg-brand-50 p-4 text-sm text-brand-900 dark:bg-brand-900/30 dark:text-brand-100">
+        {t(levelKey[lvl])}
+      </div>
+
+      {testLang === 'bn' && (
+        <p className="mt-3 text-xs text-slate-500">{t('test.banglaCpmNote')}</p>
+      )}
+
+      <div className="mt-6 flex flex-wrap gap-2">
+        <Button onClick={restart}><RotateCcw size={16} /> {t('test.restart')}</Button>
+        <Button variant="outline" onClick={another}><Shuffle size={16} /> {t('test.another')}</Button>
+        <Button variant="outline" onClick={doShare}><Share2 size={16} /> {t('test.share')}</Button>
+        <Button variant="outline" onClick={doCopy}><Copy size={16} /> {copied ? t('common.copied') : t('test.copy')}</Button>
+      </div>
+
+      <p className="mt-4 text-xs text-slate-400">
+        {lang === 'bn' ? 'ভাষা' : 'Language'}: {r.lang === 'bn' ? t('common.bangla') : t('common.english')} ·{' '}
+        {t('test.method')}: {r.method === 'avro' ? t('test.mAvro') : r.method === 'bijoy' ? t('test.mBijoy') : t('test.mEnglish')} ·{' '}
+        {t('test.mode')}: {r.mode}
+      </p>
+    </div>
+  )
+}
+
+function Field({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <div>
+      <div className="mb-2 text-sm font-medium text-slate-700 dark:text-slate-300">{label}</div>
+      {children}
+    </div>
+  )
+}
+
+function Pills({
+  value,
+  options,
+  onChange,
+}: {
+  value: string
+  options: { v: string; label: string }[]
+  onChange: (v: string) => void
+}) {
+  return (
+    <div className="flex flex-wrap gap-2">
+      {options.map((o) => (
+        <button
+          key={o.v}
+          onClick={() => onChange(o.v)}
+          className={cn(
+            'rounded-lg border px-3 py-1.5 text-sm transition-colors',
+            value === o.v
+              ? 'border-brand-500 bg-brand-50 text-brand-700 dark:bg-brand-900/30 dark:text-brand-200'
+              : 'border-slate-200 text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800',
+          )}
+        >
+          {o.label}
+        </button>
+      ))}
+    </div>
+  )
+}
+
+function Stat({
+  icon,
+  label,
+  value,
+  big,
+}: {
+  icon: ReactNode
+  label: string
+  value: string
+  big?: boolean
+}) {
+  return (
+    <div className="rounded-lg border border-slate-200 bg-white p-3 dark:border-slate-800 dark:bg-slate-900">
+      <div className="flex items-center gap-1 text-xs text-slate-500">{icon} {label}</div>
+      <div className={cn('mt-1 font-bold', big ? 'text-2xl' : 'text-lg')}>{value}</div>
+    </div>
+  )
+}
