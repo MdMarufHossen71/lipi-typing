@@ -14,8 +14,8 @@ export const aboutParagraphs: Bilingual[] = [
     en: 'Every keyboard mapping is from verified sources: the Avro Phonetic scheme is by OmicronLab (MPL-1.1), the Unicode Bijoy mapping from m17n bn-bijoyUnicode.mim, and Bijoy Bayanno info from the official site and Wikipedia. The Bijoy software is proprietary — not distributed here, only linked to the official source. The full source list is on the References page.',
   },
   {
-    bn: 'লিপি কোনো অ্যাকাউন্ট বা সার্ভার ছাড়াই কাজ করে — প্রগ্রেস আপনার ব্রাউজারে স্থানীয়ভাবে থাকে। আর্কিটেকচার এমনভাবে তৈরি যাতে ভবিষ্যতে আরও ভাষা, অ্যাকাউন্ট, ক্লাউড সিঙ্ক, লিডারবোর্ড ও PWA যোগ করা যায়।',
-    en: 'Lipi works with no account or server — progress stays local in your browser. The architecture is designed so future languages, accounts, cloud sync, leaderboards and PWA support can be added.',
+    bn: 'লিপি guest-first: অ্যাকাউন্ট ছাড়াই সব ফিচার চলে, প্রগ্রেস ব্রাউজারে স্থানীয়ভাবে থাকে। চাইলে ফ্রি অ্যাকাউন্ট (ইমেইল বা Google) খুলে Supabase-এ প্রগ্রেস ক্লাউড সিঙ্ক করা যায় — তখন অন্য ডিভাইস থেকেও একই ইতিহাস দেখা যায়। কোনো ট্র্যাকিং নেই।',
+    en: 'Lipi is guest-first: every feature works without an account and progress stays in your browser. Optionally, a free account (email or Google) syncs progress to Supabase so the same history shows on any device. No tracking, ever.',
   },
 ]
 

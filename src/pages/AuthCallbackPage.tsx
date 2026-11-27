@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { AlertTriangle, Loader2 } from 'lucide-react'
 import { useI18n } from '../i18n/I18nContext'
-import { supabase } from '../lib/supabase'
+import { loadSupabase } from '../lib/supabase'
 import { AuthShell } from '../components/auth/AuthShell'
 
 /**
@@ -34,11 +34,12 @@ export default function AuthCallbackPage() {
         navigate('/', { replace: true })
         return
       }
-      if (!supabase) {
+      const client = await loadSupabase()
+      if (!client) {
         if (!cancelled) setError('Supabase is not configured')
         return
       }
-      const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code)
+      const { error: exchangeError } = await client.auth.exchangeCodeForSession(code)
       if (exchangeError) {
         if (!cancelled) setError(exchangeError.message)
         return

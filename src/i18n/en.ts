@@ -258,14 +258,14 @@ export const en: Record<string, string> = {
 
   // Dashboard
   'dashboard.title': 'Learning Dashboard',
-  'dashboard.subtitle': 'Your progress and test history — saved locally.',
+  'dashboard.subtitle': 'Your progress and test history — local for guests, synced for signed-in users.',
   'dashboard.overall': 'Overall',
   'dashboard.banglaProgress': 'Bangla progress',
   'dashboard.englishProgress': 'English progress',
   'dashboard.avroProgress': 'Avro',
   'dashboard.bijoyProgress': 'Bijoy',
   'dashboard.completedLessons': 'Completed lessons',
-  'dashboard.practiceTime': 'Total practice time',
+  'dashboard.practiceTime': 'Total test time',
   'dashboard.testHistory': 'Test history',
   'dashboard.highestSpeed': 'Highest speed',
   'dashboard.avgAccuracy': 'Average accuracy',
@@ -369,8 +369,8 @@ export const en: Record<string, string> = {
   'pages.contact.email': 'Email',
   'pages.contact.message': 'Message',
   'pages.contact.send': 'Send',
-  'pages.contact.sent': 'Thanks! Your message has been recorded (demo — not sent anywhere).',
-  'pages.contact.note': 'This is a static demo form — there is no backend.',
+  'pages.contact.sent': 'Your email app should have opened with the message pre-filled — press Send there to deliver it. You can also write directly to maruf.112005@gmail.com.',
+  'pages.contact.note': 'Submitting opens your own email app with the message pre-filled. Nothing is sent automatically — no tracking, no stored data.',
 
   // Footer
   'footer.tagline': 'A free, open-source platform to learn Bangla & English typing.',

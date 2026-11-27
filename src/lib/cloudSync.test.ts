@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   fetchCloudHistory,
   mergeById,
@@ -7,6 +7,16 @@ import {
 } from './cloudSync'
 import { resetAllProgress } from './progress'
 import type { TestResult } from '../types'
+
+// The unconfigured fallback must stay deterministic in tests (no env leakage).
+vi.mock('./supabase', () => ({
+  isSupabaseConfigured: false,
+  loadSupabase: async () => null,
+  requireClient: (c: unknown) => {
+    if (!c) throw new Error('Supabase is not configured')
+    return c
+  },
+}))
 
 // Minimal stateful fake of the Supabase query builder for the tables cloudSync touches.
 function makeFakeClient() {

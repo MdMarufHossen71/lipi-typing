@@ -20,7 +20,7 @@ import { saveTestResult } from '../lib/progress'
 import { saveTypingResultToCloud } from '../lib/cloudSync'
 import { Button, Card, SegmentedControl } from './ui'
 import { ProgressRing } from './ProgressRing'
-import { cn, formatDuration, formatNumber } from '../lib/utils'
+import { cn, clamp, formatDuration, formatNumber } from '../lib/utils'
 import { Seo } from './Seo'
 
 type Phase = 'config' | 'running' | 'finished'
@@ -44,7 +44,9 @@ export function TypingTest() {
   const [method, setMethod] = useState<TypingMethod>('avro')
   const [mode, setMode] = useState<TestMode>('timed')
   const [durationSec, setDurationSec] = useState(60)
-  const [customMin, setCustomMin] = useState(5)
+  // Kept as a string so the field can be temporarily empty while typing;
+  // sanitisedCustomMin is the only value the timer ever uses.
+  const [customMin, setCustomMin] = useState('5')
   const [target, setTarget] = useState('')
   const [input, setInput] = useState('')
   const [elapsed, setElapsed] = useState(0)
@@ -55,7 +57,11 @@ export function TypingTest() {
   const targetRef = useRef('')
   const inputValRef = useRef('')
   // "Custom" stores durationSec = 0; the real length is then customMin minutes.
-  const effectiveDuration = durationSec === 0 ? customMin * 60 : durationSec
+  // App-level clamp: empty, negative, decimal and absurd inputs all resolve to
+  // a safe 1–60 integer before the timer or text generation ever sees them.
+  const parsedCustomMin = Math.round(Number(customMin))
+  const sanitisedCustomMin = Number.isFinite(parsedCustomMin) ? clamp(parsedCustomMin, 1, 60) : 5
+  const effectiveDuration = durationSec === 0 ? sanitisedCustomMin * 60 : durationSec
   // Bangla is typed with Avro or Bijoy; English text with the QWERTY layout.
   const methodOptions: TypingMethod[] =
     testLang === 'en' ? ['english'] : METHODS.filter((m) => m !== 'english')
@@ -301,8 +307,10 @@ export function TypingTest() {
                     max={60}
                     className="input w-24"
                     value={customMin}
-                    onChange={(e) => setCustomMin(Number(e.target.value) || 1)}
+                    onChange={(e) => setCustomMin(e.target.value)}
+                    onBlur={() => setCustomMin(String(sanitisedCustomMin))}
                     placeholder={t('test.customPlaceholder')}
+                    inputMode="numeric"
                   />
                 </div>
               )}
@@ -364,6 +372,7 @@ export function TypingTest() {
           rows={3}
           value={input}
           onChange={(e) => setInput(e.target.value)}
+          onPaste={(e) => e.preventDefault()}
           placeholder={t('test.typeHere')}
           spellCheck={false}
           autoComplete="off"

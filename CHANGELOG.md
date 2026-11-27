@@ -6,6 +6,31 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Fixed — production audit (2026-11-28)
+
+#### Typing text variety & engine correctness
+- **Every test opened with the same text**: `pickText()` cycled all pools from index 0, so repeated runs were identical. Each cycle now starts at a random pool index — verified live across consecutive runs.
+- **Unicode normalisation**: the engine now NFC-normalises text before comparing. Decomposed য/ড/ঢ+nukta (what our pools store) vs precomposed য়/ড়/ঢ় (what some IMEs emit) previously scored wrong despite looking identical; 40 decomposed sequences existed in the pools.
+- **Custom duration was exploitable/unstable**: `-5` finished a test in 0.2 s and saved `durationSec: -300`; `0.01` gave a 0.6 s test; `999` generated ~220 k characters and froze the tab (O(n²) text building + 220 k rendered spans). The value is now clamped in app logic to 1–60 integer minutes, and text building is O(n).
+- **Paste-to-win**: pasting the full target text instantly finished the test and saved a ~56 000 CPM result. Paste is now blocked in the typing-test input (practice stays paste-friendly since nothing is saved there).
+- **Beginner mode ignored duration**: it always produced the same ~90-character target, ending long tests in seconds; it now scales like the other modes.
+- **Practice "New drill" lied**: the Shuffle button deterministically cycled back after 4 clicks (beginner) / 10 clicks (sentence). It now picks a true random item (never the same twice in a row).
+- 8 more Bangla + 3 more English paragraphs, 8 sentences and 4 advanced texts added for genuine variety (now 13 bn / 10 en paragraphs).
+
+#### Honesty & content consistency
+- FAQ/About still claimed "no account or server" after accounts + cloud sync shipped. FAQ now explains guest-local vs signed-in-cloud storage and what creating an account does; About's "accounts are future work" framing corrected; dashboard subtitle updated.
+- Dashboard metric renamed **"Total practice time" → "Total test time"** (it only ever summed test history).
+- **Contact form no longer fakes success**: submitting opens the visitor's email client with the message pre-filled (mailto) — honest about what happens; direct email address shown.
+- Practice page now states the OS-IME requirement for Bangla input (previously only on the test page).
+
+#### Performance & SEO
+- **Main bundle cut 535 KB → 318 KB (153 → 98 KB gzip)**: `@supabase/supabase-js` was statically imported into the entry chunk; it now lazy-loads in its own async chunk that guests (and deployments without env vars) never download.
+- Tests are now hard-isolated from the developer's real `.env.local` — no test can reach the live Supabase project.
+- Added the missing `public/sitemap.xml` (robots.txt pointed at a 404), per-route canonical URLs, `og:url`, and corrected `twitter:card` to `summary` (no OG image exists).
+- Avro engine integration investigated (jQuery-free port `nodejs-avro-phonetic`: unmaintained, Node-only, unknown bundle cost) — documented in README; the simplified converter remains, clearly labelled.
+- Contact form labels now use `htmlFor`/ids for screen readers.
+- 11 new tests: text variety, length scaling, beginner duration scaling, custom-duration clamping (negative/decimal/huge), NFC decomposition equality. **84 tests total, all passing.**
+
 ### Added — accounts & cloud sync (Supabase)
 - **Optional accounts**: email/password sign-up with full name, email confirmation, sign-in with show/hide password, Google OAuth (application flow implemented; provider configuration is a dashboard task), password recovery + update flow, account page with display-name editing and sign-out. Auth pages: `/login`, `/register`, `/forgot-password`, `/update-password`, `/auth/callback`, `/account` (guarded).
 - **Central AuthContext** with session restore, `onAuthStateChange` listener, lazy profile creation (covers users created before the migration) and stable bilingual error codes.

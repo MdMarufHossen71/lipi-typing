@@ -21,6 +21,11 @@ export const testTexts: Record<TestLang, TextPool> = {
       'বই পড়া জ্ঞানের সবচেয়ে সহজ পথ। একটি ভালো বই পাঠককে অচেনা জগতের দরজা খুলে দেয়। প্রতিদিন অল্প করে হলেও বই পড়ার অভ্যাস গড়ে তুলুন, জ্ঞানের ভাণ্ডার ক্রমাগত বাড়বে।',
       'বর্ষা এলে প্রকৃতি যেন নতুন জীবন পায়। আকাশ থেকে ঝরে পড়ে বৃষ্টির ফোঁটা, নদীতে বাড়ে পানি, গ্রামের পথঘর ভিজে যায়। বর্ষার সৌন্দর্য উপভোগ করতে চাইলে জানালার পাশে বসে গরম চা খান।',
       'কম্পিউটার আজ আমাদের দৈনন্দিন জীবনের অবিচ্ছেদ্য অংশ। অফিস, শিক্ষা, চিকিৎসা কিংবা বিনোদন — সব ক্ষেত্রেই কম্পিউটার ব্যবহার হচ্ছে। দ্রুত ও নির্ভুল টাইপিং শিখলে কাজের গতি ও মান দুটোই বাড়ে।',
+      'টাইপিং দক্ষতা আজকের যুগে চাকরির বাজারে বিশেষ মূল্য পায়। সরকারি ও বেসরকারি অফিসে প্রতিদিন হাজারো অক্ষর টাইপ করতে হয়। যারা দ্রুত টাইপ করতে পারেন, তারা কম সময়ে বেশি কাজ শেষ করেন।',
+      'ইন্টারনেট পৃথিবীকে একটি গ্রামে পরিণত করেছে। মুহূর্তের মধ্যে বার্তা পৌঁছে যায় পৃথিবীর অন্য প্রান্তে। তবু মাতৃভাষায় লেখার আনন্দ অনন্য; নিজের ভাষায় ভাবতে পারাই সবচেয়ে বড় ক্ষমতা।',
+      'সকালবেলার আলো ঢুকে পড়ে ঘরের কোণে। পাখির ডাকে চারপাশ ভরে ওঠে। এমন শান্ত সময়ে মন দিয়ে কোনো কাজ করলে মনোযোগ নিজে থেকেই বাড়ে। দিনের শুরুটা ভালো হলে সারাদিন ভালো যায়।',
+      'বাংলা একবচন ও বহুবচনে অনেক সময় প্রত্যয় যুক্ত হয়। বানান শুদ্ধ রাখতে মূল শব্দ ও প্রত্যয়ের মিল বুঝতে হয়। প্রতিদিন কয়েকটি শব্দের বানান অনুশীলন করলে লেখায় আত্মবিশ্বাস বাড়ে।',
+      'স্বপ্ন দেখা সহজ, কিন্তু স্বপ্ন পূরণ করতে পরিশ্রম লাগে। ছোট ছোট লক্ষ্য ঠিক করে প্রতিদিন একটু একটু এগোলে একদিন বড় লক্ষ্যও সম্ভব হয়ে ওঠে। টাইপিং শেখাও ঠিক তেমনই একটি যাত্রা।',
     ],
     sentences: [
       'আমি বাংলা ভাষায় কথা বলি।',
@@ -33,6 +38,12 @@ export const testTexts: Record<TestLang, TextPool> = {
       'সময়ের এক ফোঁড় সেই রাখে দশ।',
       'বর্ষা মানেই প্রকৃতির নতুন জীবন।',
       'কম্পিউটার শিক্ষা আজ অপরিহার্য।',
+      'নিয়মিত চর্চায় হাত চলতে শেখে।',
+      'ভুল করা মানেই শেখা শেষ নয়।',
+      'অধ্যবসায় সব প্রতিবন্ধকতা জয় করে।',
+      'ঢাকা দেশের প্রাণকেন্দ্র।',
+      'গ্রন্থাগার জ্ঞানের মন্দির।',
+      'মিত্রতা জীবনের সম্পদ।',
     ],
     words: [
       'বাংলা', 'দেশ', 'শিক্ষা', 'প্রযুক্তি', 'কম্পিউটার', 'কীবোর্ড', 'অনুশীলন',
@@ -43,6 +54,8 @@ export const testTexts: Record<TestLang, TextPool> = {
     advanced: [
       'রাষ্ট্রভাষা আন্দোলনের মধ্য দিয়ে বাংলা ভাষা তার নিজস্ব মর্যাদা পুনরুদ্ধার করে; এটি কেবল একটি ভাষিক অধিকারের সংগ্রাম ছিল না, বরং একটি জাতির আত্মপরিচয়ের সংগ্রাম ছিল।',
       'প্রযুক্তির দ্রুত উন্নয়নের এই যুগে মাতৃভাষায় ডিজিটাল উপস্থিতি নিশ্চিত করা অত্যন্ত জরুরি; ইউনিকোড ও মুক্ত সফটওয়্যার এই লক্ষ্যে গুরুত্বপূর্ণ ভূমিকা পালন করে।',
+      'ভাষার মধ্যেই একটি জাতির ইতিহাস, সাহিত্য আর মনন গাঁথা থাকে; তাই মাতৃভাষায় টাইপ করা কেবল কারিগরি দক্ষতা নয়, এটি নিজের সাংস্কৃতিক পরিচয়কে ডিজিটাল যুগে টিকিয়ে রাখার একটি প্রয়াস।',
+      'শুদ্ধ বানান ও দ্রুত টাইপিং একসাথে অনুশীলন করতে হয়; প্রথমে ধীরে ধীরে নির্ভুল লেখার অভ্যাস গড়ুন, তারপর গতি বাড়ান — যে গতি নির্ভুলতার ভিতে দাঁড়িয়ে নেই, সে গতি বারবার সংশোধনের ঝামেলায় ডুবিয়ে রাখে।',
     ],
   },
   en: {
@@ -54,6 +67,9 @@ export const testTexts: Record<TestLang, TextPool> = {
       'Keyboard shortcuts can save you hours every week. Learn a few at a time: copy, paste, undo and switching between windows. When shortcuts become muscle memory, your hands barely leave the keys.',
       'Reading a good book opens the door to an unfamiliar world. Even twenty minutes a day builds vocabulary, focus and imagination. Choose something you genuinely enjoy, and the habit will sustain itself.',
       'Unicode makes it possible for Bangla text to appear correctly on every device and operating system. Always prefer Unicode over legacy font encodings, because legacy files break when fonts are missing.',
+      'Regular breaks protect your wrists and eyes. Follow the twenty-twenty rule: every twenty minutes, look twenty feet away for twenty seconds. Your hands stay fresh, and your focus lasts much longer.',
+      'A mechanical keyboard, a laptop membrane, or a compact tablet keyboard all work fine for practice. What matters is finger position and rhythm, not the price of your hardware. Any keyboard can teach discipline.',
+      "Bangla has its own punctuation: the dari ends a sentence, and the double dari marks a longer pause. Learning these marks is part of writing well, just as commas and periods are in English.",
     ],
     sentences: [
       'Practice makes perfect.',
@@ -66,6 +82,12 @@ export const testTexts: Record<TestLang, TextPool> = {
       'Stay calm and keep typing.',
       'Short daily sessions beat long rare ones.',
       'Unicode text works everywhere, on every device.',
+      'Errors are proof that you are trying.',
+      'Accuracy first; speed will follow.',
+      'Every expert was once a beginner.',
+      'Practice with purpose, not pressure.',
+      'Small steps every day add up fast.',
+      'Look at the screen, trust your fingers.',
     ],
     words: [
       'type', 'keyboard', 'practice', 'accuracy', 'speed', 'language', 'finger',
@@ -76,8 +98,31 @@ export const testTexts: Record<TestLang, TextPool> = {
     advanced: [
       'Although typing quickly is impressive, the hallmark of a truly skilled typist is the ability to maintain high accuracy under pressure; this balance only emerges after hundreds of hours of deliberate, focused practice.',
       'The evolution of keyboard layouts—from early typewriters designed to prevent mechanical jams, to modern ergonomic designs—reflects a constant tension between historical inertia and the pursuit of efficiency.',
+      'Speed without accuracy is a false economy: every mistyped character must be found and corrected, so a slower, steadier typist who rarely errs often finishes a document sooner than a hurried typist who rewrites half of it.',
+      'The best practice sessions have a clear shape: a gentle warm-up on the home row, a focused drill on the letters that trip you, and a relaxed paragraph at the end; progress lives in the repetition of small, deliberate effort.',
     ],
   },
+}
+
+/**
+ * Cycle through `pool` starting at a random index until the joined text
+ * reaches `targetChars` characters. Random start = every run opens with a
+ * different item (repeated identical openers were the single most common
+ * user complaint), while every pool item still comes around in turn.
+ */
+function cycleTo(pool: string[], targetChars: number): string {
+  if (pool.length === 0) return ''
+  const start = Math.floor(Math.random() * pool.length)
+  const out: string[] = []
+  let length = 0
+  let i = 0
+  while (length < targetChars) {
+    const item = pool[(start + i) % pool.length]
+    out.push(item)
+    length += item.length + 1 // +1 for the joining space
+    i++
+  }
+  return out.join(' ')
 }
 
 /** Build a target text long enough for a given duration. */
@@ -88,49 +133,14 @@ export function pickText(lang: TestLang, mode: TestMode, durationSec: number): s
   const cpmTarget = lang === 'bn' ? 220 : 300
   const targetChars = Math.round(minutes * cpmTarget) + 60
 
-  if (mode === 'word') {
-    const out: string[] = []
-    let i = 0
-    while (out.join(' ').length < targetChars) {
-      out.push(pool.words[i % pool.words.length])
-      i++
-    }
-    return out.join(' ')
-  }
-
-  if (mode === 'sentence') {
-    const out: string[] = []
-    let i = 0
-    while (out.join(' ').length < targetChars) {
-      out.push(pool.sentences[i % pool.sentences.length])
-      i++
-    }
-    return out.join(' ')
-  }
-
-  if (mode === 'beginner') {
-    return pool.beginner.join(' ')
-  }
-
-  if (mode === 'advanced') {
-    const src = pool.advanced
-    const out: string[] = []
-    let i = 0
-    while (out.join(' ').length < targetChars) {
-      out.push(src[i % src.length])
-      i++
-    }
-    return out.join(' ')
-  }
-
-  // 'timed' and 'fixed' — use paragraphs, repeated to reach target length.
-  const out: string[] = []
-  let i = 0
-  while (out.join(' ').length < targetChars) {
-    out.push(pool.paragraphs[i % pool.paragraphs.length])
-    i++
-  }
-  return out.join(' ')
+  if (mode === 'word') return cycleTo(pool.words, targetChars)
+  if (mode === 'sentence') return cycleTo(pool.sentences, targetChars)
+  // Beginner drills scale with the duration too — a fixed 90-character target
+  // ended a 5-minute test in under a minute.
+  if (mode === 'beginner') return cycleTo(pool.beginner, targetChars)
+  if (mode === 'advanced') return cycleTo(pool.advanced, targetChars)
+  // 'timed' and 'fixed' — paragraphs cycled to the target length.
+  return cycleTo(pool.paragraphs, targetChars)
 }
 
 /** A fresh paragraph different from the current one (for "another paragraph"). */

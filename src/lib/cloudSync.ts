@@ -11,7 +11,7 @@ import {
   getCompletedLessons,
   getTestHistory,
 } from './progress'
-import { supabase } from './supabase'
+import { loadSupabase } from './supabase'
 import type { Database, LessonProgressRow, TypingResultRow } from './supabase'
 import type { LessonCompletion, TestResult } from '../types'
 
@@ -79,7 +79,7 @@ function chunk<T>(arr: T[], size: number): T[][] {
 /** Upload local-only typing results + lesson completions to the cloud. */
 export async function migrateLocalProgress(
   userId: string,
-  client: SupabaseClient<Database> | null = supabase,
+  client?: SupabaseClient<Database> | null,
 ): Promise<MigrationSummary> {
   const summary: MigrationSummary = {
     resultsMigrated: 0,
@@ -88,6 +88,7 @@ export async function migrateLocalProgress(
     lessonsSkipped: 0,
     errors: [],
   }
+  client = client ?? await loadSupabase()
   if (!client) throw new Error('Supabase is not configured')
 
   const localResults = getTestHistory()
@@ -153,8 +154,9 @@ export async function migrateLocalProgress(
 export async function saveTypingResultToCloud(
   userId: string,
   result: TestResult,
-  client: SupabaseClient<Database> | null = supabase,
+  client?: SupabaseClient<Database> | null,
 ): Promise<void> {
+  client = client ?? await loadSupabase()
   if (!client) throw new Error('Supabase is not configured')
   const { error } = await client.from('typing_results').insert(resultToRow(userId, result))
   if (error) throw error
@@ -164,8 +166,9 @@ export async function saveTypingResultToCloud(
 export async function saveLessonCompletionToCloud(
   userId: string,
   completion: LessonCompletion,
-  client: SupabaseClient<Database> | null = supabase,
+  client?: SupabaseClient<Database> | null,
 ): Promise<void> {
+  client = client ?? await loadSupabase()
   if (!client) throw new Error('Supabase is not configured')
   const { error } = await client
     .from('lesson_progress')
@@ -184,10 +187,11 @@ export async function saveLessonCompletionToCloud(
 /** Fetch the user's cloud typing history (newest first), paginated. */
 export async function fetchCloudHistory(
   userId: string,
-  client: SupabaseClient<Database> | null = supabase,
+  client?: SupabaseClient<Database> | null,
   limit = 200,
   offset = 0,
 ): Promise<TestResult[]> {
+  client = client ?? await loadSupabase()
   if (!client) throw new Error('Supabase is not configured')
   const { data, error } = await client
     .from('typing_results')
@@ -202,8 +206,9 @@ export async function fetchCloudHistory(
 /** Fetch the user's cloud lesson completions. */
 export async function fetchCloudLessonCompletions(
   userId: string,
-  client: SupabaseClient<Database> | null = supabase,
+  client?: SupabaseClient<Database> | null,
 ): Promise<LessonCompletion[]> {
+  client = client ?? await loadSupabase()
   if (!client) throw new Error('Supabase is not configured')
   const { data, error } = await client
     .from('lesson_progress')

@@ -1,8 +1,8 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
-import type { Session, User } from '@supabase/supabase-js'
-import { isSupabaseConfigured, requireClient, supabase } from '../lib/supabase'
-import type { ProfileRow } from '../lib/supabase'
+import type { Session, SupabaseClient, User } from '@supabase/supabase-js'
+import { isSupabaseConfigured, loadSupabase, requireClient } from '../lib/supabase'
+import type { Database, ProfileRow } from '../lib/supabase'
 
 export type AuthStatus = 'loading' | 'guest' | 'authed'
 
@@ -53,10 +53,12 @@ export function mapAuthError(err: { message?: string; status?: number } | null |
   return 'generic'
 }
 
+const NOT_CONFIGURED: AuthResult = { ok: false, errorCode: 'generic' }
+
 /** Load (or lazily create) the profile row for a user. */
-async function loadProfile(user: User): Promise<ProfileRow | null> {
-  const client = requireClient()
-  const { data } = await client.from('profiles').select('*').eq('id', user.id).maybeSingle()
+async function loadProfile(client: SupabaseClient<Database> | null, user: User): Promise<ProfileRow | null> {
+  const c = requireClient(client)
+  const { data } = await c.from('profiles').select('*').eq('id', user.id).maybeSingle()
   if (data) return data
   // The handle_new_user trigger normally creates this; cover users created
   // before the migration or trigger failures.
@@ -65,7 +67,7 @@ async function loadProfile(user: User): Promise<ProfileRow | null> {
     user.email?.split('@')[0] ||
     'User'
   const avatar = (user.user_metadata?.avatar_url as string | undefined) ?? null
-  const { data: created, error } = await client
+  const { data: created, error } = await c
     .from('profiles')
     .upsert({ id: user.id, display_name: fallbackName, avatar_url: avatar })
     .select()
@@ -80,13 +82,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<ProfileRow | null>(null)
 
   useEffect(() => {
-    if (!supabase) {
+    if (!isSupabaseConfigured) {
       setStatus('guest')
       return
     }
     let mounted = true
+    let unsubscribe: (() => void) | undefined
 
-    async function adoptSession(session: Session | null) {
+    async function adoptSession(client: NonNullable<Awaited<ReturnType<typeof loadSupabase>>>, session: Session | null) {
       const u = session?.user ?? null
       setUser(u)
       if (!u) {
@@ -96,40 +99,52 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       setStatus('authed')
       try {
-        const p = await loadProfile(u)
+        const p = await loadProfile(client, u)
         if (mounted) setProfile(p)
       } catch {
         /* profile stays null; UI falls back to email-derived name */
       }
     }
 
-    supabase.auth
-      .getSession()
-      .then(({ data }) => adoptSession(data.session))
-      .catch(() => {
+    // The Supabase chunk is fetched on first use only (guests never load it).
+    loadSupabase().then((client) => {
+      if (!client) {
         if (mounted) setStatus('guest')
-      })
+        return
+      }
+      client.auth
+        .getSession()
+        .then(({ data }) => {
+          if (mounted) void adoptSession(client, data.session)
+        })
+        .catch(() => {
+          if (mounted) setStatus('guest')
+        })
 
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
-      void adoptSession(session)
+      const { data: sub } = client.auth.onAuthStateChange((_event, session) => {
+        if (mounted) void adoptSession(client, session)
+      })
+      unsubscribe = () => sub.subscription.unsubscribe()
     })
 
     return () => {
       mounted = false
-      sub.subscription.unsubscribe()
+      unsubscribe?.()
     }
   }, [])
 
   async function signIn(email: string, password: string): Promise<AuthResult> {
-    if (!supabase) return { ok: false, errorCode: 'generic' }
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    const client = await loadSupabase()
+    if (!client) return NOT_CONFIGURED
+    const { error } = await client.auth.signInWithPassword({ email, password })
     if (error) return { ok: false, errorCode: mapAuthError(error) }
     return { ok: true }
   }
 
   async function signUp(email: string, password: string, fullName: string): Promise<AuthResult> {
-    if (!supabase) return { ok: false, errorCode: 'generic' }
-    const { data, error } = await supabase.auth.signUp({
+    const client = await loadSupabase()
+    if (!client) return NOT_CONFIGURED
+    const { data, error } = await client.auth.signUp({
       email,
       password,
       options: {
@@ -143,13 +158,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   async function signOut(): Promise<void> {
-    if (!supabase) return
-    await supabase.auth.signOut()
+    const client = await loadSupabase()
+    if (!client) return
+    await client.auth.signOut()
   }
 
   async function signInWithGoogle(): Promise<AuthResult> {
-    if (!supabase) return { ok: false, errorCode: 'generic' }
-    const { error } = await supabase.auth.signInWithOAuth({
+    const client = await loadSupabase()
+    if (!client) return NOT_CONFIGURED
+    const { error } = await client.auth.signInWithOAuth({
       provider: 'google',
       options: { redirectTo: `${window.location.origin}/auth/callback` },
     })
@@ -158,8 +175,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   async function resetPassword(email: string): Promise<AuthResult> {
-    if (!supabase) return { ok: false, errorCode: 'generic' }
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    const client = await loadSupabase()
+    if (!client) return NOT_CONFIGURED
+    const { error } = await client.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/auth/callback?type=recovery`,
     })
     if (error) return { ok: false, errorCode: mapAuthError(error) }
@@ -167,15 +185,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   async function updatePassword(password: string): Promise<AuthResult> {
-    if (!supabase) return { ok: false, errorCode: 'generic' }
-    const { error } = await supabase.auth.updateUser({ password })
+    const client = await loadSupabase()
+    if (!client) return NOT_CONFIGURED
+    const { error } = await client.auth.updateUser({ password })
     if (error) return { ok: false, errorCode: mapAuthError(error) }
     return { ok: true }
   }
 
   async function updateDisplayName(name: string): Promise<AuthResult> {
-    if (!supabase) return { ok: false, errorCode: 'generic' }
-    const client = requireClient()
+    const loaded = await loadSupabase()
+    if (!loaded) return NOT_CONFIGURED
+    const client = requireClient(loaded)
     const { error: authErr } = await client.auth.updateUser({ data: { full_name: name } })
     if (authErr) return { ok: false, errorCode: mapAuthError(authErr) }
     if (user) {
@@ -215,3 +235,6 @@ export function useAuth(): AuthCtx {
   if (!ctx) throw new Error('useAuth must be used within AuthProvider')
   return ctx
 }
+
+// Keep the Database type referenced for consumers of this module's profile type.
+export type { Database }

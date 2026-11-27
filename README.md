@@ -26,6 +26,12 @@ account (email/password or Google) adds cross-device cloud sync via Supabase.
   **simplified learning tool** — a longest-match approximation, **not** the full
   Avro engine. For real phonetic typing, install [Avro Keyboard](https://omicronlab.com/avro-keyboard.html)
   (OmicronLab) or an IME that bundles the Avro Phonetic engine.
+  We evaluated integrating a full engine: the only jQuery-free port
+  ([nodejs-avro-phonetic](https://github.com/wahidsadik/nodejs-avro-phonetic), MPL-1.1)
+  is ~a decade old, unmaintained, Node-targeted with unverified browser support
+  and an unknown dictionary bundle size — so Lipi ships the honest simplified
+  converter instead, and the browser still needs an OS-level IME for real
+  Bangla input.
 - Lipi does **not** bundle, mirror or redistribute Bijoy software or its
   proprietary fonts. Bijoy / Bijoy Bayanno are products of Ananda Computers —
   see the [official site](https://www.bijoyekushe.net.bd/) and the in-app

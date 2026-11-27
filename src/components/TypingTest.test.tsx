@@ -122,6 +122,38 @@ describe('TypingTest configuration', () => {
       vi.useRealTimers()
     }
   })
+
+  it.each([
+    { label: 'negative', raw: '-5', expectedMinutes: 1, expectedSec: 60 },
+    { label: 'tiny decimal', raw: '0.01', expectedMinutes: 1, expectedSec: 60 },
+    { label: 'decimal rounds', raw: '2.5', expectedMinutes: 3, expectedSec: 180 },
+    { label: 'huge', raw: '999', expectedMinutes: 60, expectedSec: 3600 },
+  ])('clamps a custom duration of $label to a safe $expectedMinutes-minute test', async ({ raw, expectedSec }) => {
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'setInterval', 'clearInterval', 'Date'] })
+    try {
+      renderTest()
+      fireEvent.click(pill('test.dCustom'))
+      const minutesInput = screen.getByLabelText(bn['test.customMin'])
+      fireEvent.change(minutesInput, { target: { value: raw } })
+      fireEvent.click(btn('test.start'))
+
+      // An early tick must NOT finish an instant test regardless of the raw value.
+      act(() => {
+        vi.advanceTimersByTime(200)
+      })
+      expect(screen.queryByText(bn['test.finished'])).toBeNull()
+
+      // Run to completion and confirm the sanitised duration was recorded.
+      act(() => {
+        vi.advanceTimersByTime(expectedSec * 1000 + 1000)
+      })
+      expect(screen.getByText(bn['test.finished'])).toBeTruthy()
+      const [saved] = readHistory()
+      expect(saved.durationSec).toBe(expectedSec)
+    } finally {
+      vi.useRealTimers()
+    }
+  })
 })
 
 describe('TypingTest timing and saving', () => {

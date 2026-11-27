@@ -17,14 +17,14 @@ export function PracticeSession() {
   const { t } = useI18n()
   const [lang, setLang] = useState<TestLang>('bn')
   const [drill, setDrill] = useState<Drill>('beginner')
-  const [seed, setSeed] = useState(0)
+  const [drillIndex, setDrillIndex] = useState(0)
   const [input, setInput] = useState('')
 
   const text = useMemo(() => {
     if (drill === 'free') return ''
     const pool = testTexts[lang][drill === 'beginner' ? 'beginner' : 'sentences']
-    return pool[seed % pool.length]
-  }, [lang, drill, seed])
+    return pool[drillIndex % pool.length]
+  }, [lang, drill, drillIndex])
 
   const cmp = useMemo(() => compareChars(text, input), [text, input])
   const correct = cmp.filter((c) => c.state === 'correct').length
@@ -33,12 +33,24 @@ export function PracticeSession() {
 
   function pickDrill(v: string) {
     setDrill(v as Drill)
-    setSeed(0)
+    setDrillIndex(0)
     setInput('')
   }
 
   function pickLang(v: string) {
     setLang(v as TestLang)
+    setDrillIndex(0)
+    setInput('')
+  }
+
+  /** True random pick (never the same item twice in a row) — a "Shuffle"
+   * button that deterministically cycled back after 4 clicks was a lie. */
+  function newDrill() {
+    const pool = testTexts[lang][drill === 'beginner' ? 'beginner' : 'sentences']
+    if (pool.length <= 1) return
+    let next = drillIndex
+    while (next === drillIndex) next = Math.floor(Math.random() * pool.length)
+    setDrillIndex(next)
     setInput('')
   }
 
@@ -147,10 +159,7 @@ export function PracticeSession() {
               <button
                 type="button"
                 className="inline-flex items-center gap-1 font-medium text-brand-600 hover:text-brand-700 dark:text-brand-400"
-                onClick={() => {
-                  setSeed((s) => s + 1)
-                  setInput('')
-                }}
+                onClick={() => newDrill()}
               >
                 <Shuffle size={12} /> {t('practice.newDrill')}
               </button>

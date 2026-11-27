@@ -5,7 +5,8 @@ interface SeoProps {
   description?: string
 }
 
-/** Lightweight SEO: sets document.title and the meta description at runtime. */
+/** Lightweight SEO: sets document.title, the meta description and a route
+ * canonical URL at runtime (SPA — no prerendering). */
 export function Seo({ title, description }: SeoProps) {
   useEffect(() => {
     document.title = title
@@ -18,6 +19,14 @@ export function Seo({ title, description }: SeoProps) {
       }
       tag.setAttribute('content', description)
     }
+    // Per-route canonical so each page is its own URL for crawlers.
+    let canonical = document.querySelector<HTMLLinkElement>('link[rel="canonical"]')
+    if (!canonical) {
+      canonical = document.createElement('link')
+      canonical.rel = 'canonical'
+      document.head.appendChild(canonical)
+    }
+    canonical.href = `${window.location.origin}${window.location.pathname}`
   }, [title, description])
   return null
 }

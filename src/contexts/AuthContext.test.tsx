@@ -88,9 +88,12 @@ const fake = vi.hoisted(() => {
 })
 
 vi.mock('../lib/supabase', () => ({
-  supabase: fake.client,
   isSupabaseConfigured: true,
-  requireClient: () => fake.client,
+  requireClient: (c: unknown) => {
+    if (!c) throw new Error('Supabase is not configured')
+    return c
+  },
+  loadSupabase: async () => fake.client,
 }))
 
 interface ProbeState {

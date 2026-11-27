@@ -16,8 +16,8 @@ export const faqItems: FaqItem[] = [
   {
     q: { bn: 'এই ওয়েবসাইট কি Avro ইঞ্জিন দিয়ে বাংলা টাইপ করতে পারে?', en: 'Can this website type Bangla using an Avro engine?' },
     a: {
-      bn: 'অনুশীলন বক্সে একটি সরল লার্নিং কনভার্টার আছে যা সাধারণ শব্দে কাজ করে। তবে পূর্ণ ফনেটিক টাইপিংয়ের জন্য আপনার অপারেটিং সিস্টেমে Avro Keyboard ইনস্টল থাকা দরকার — ওয়েবসাইট আপনার OS কীবোর্ড নিয়ন্ত্রণ করে না।',
-      en: 'The practice box has a simplified learning converter that works for common words. For full phonetic typing, install Avro Keyboard on your operating system — the website does not control your OS keyboard.',
+      bn: 'না। Avro কোর্স পেজে একটি সরল লার্নিং কনভার্টার আছে — শেখার জন্য সাধারণ শব্দে কাজ করে, কিন্তু এটি পূর্ণ Avro ইঞ্জিন নয় (জটিল শব্দে ভিন্ন ফল দিতে পারে)। বাস্তব টাইপিংয়ের জন্য আপনার অপারেটিং সিস্টেমে Avro Keyboard বা Bijoy IME ইনস্টল থাকা দরকার — ওয়েবসাইট আপনার OS কীবোর্ড নিয়ন্ত্রণ করে না।',
+      en: 'No. The Avro course page has a simplified learning converter — good for practising common words, but it is NOT the full Avro engine (complex words may differ). For real typing, install Avro Keyboard or a Bijoy IME on your operating system — the website does not control your OS keyboard.',
     },
   },
   {
@@ -37,8 +37,15 @@ export const faqItems: FaqItem[] = [
   {
     q: { bn: 'আমার প্রগ্রেস কোথায় সংরক্ষিত হয়?', en: 'Where is my progress saved?' },
     a: {
-      bn: 'সব প্রগ্রেস ও টেস্ট ইতিহাস আপনার ব্রাউজারের localStorage-এ স্থানীয়ভাবে থাকে। কোনো অ্যাকাউন্ট বা সার্ভার নেই। ব্রাউজার ডেটা মুছলে প্রগ্রেসও মুছে যাবে।',
-      en: 'All progress and test history are stored locally in your browser’s localStorage. There is no account or server. Clearing browser data will erase progress.',
+      bn: 'অ্যাকাউন্ট ছাড়া ব্যবহার করলে সব প্রগ্রেস ও টেস্ট ইতিহাস আপনার ব্রাউজারের localStorage-এ থাকে — ব্রাউজার ডেটা মুছলে প্রগ্রেসও মুছে যাবে। অ্যাকাউন্ট খুললে প্রগ্রেস Supabase-এ ক্লাউড সিঙ্ক হয়, তাই অন্য ডিভাইস থেকেও একই ইতিহাস দেখা যায়; লোকাল কপি তখনও অফলাইন ক্যাশ হিসেবে থাকে।',
+      en: 'Without an account, all progress and test history stay in your browser’s localStorage — clearing browser data erases them. With an account, progress syncs to Supabase so the same history shows on any device; the local copy remains as an offline cache.',
+    },
+  },
+  {
+    q: { bn: 'অ্যাকাউন্ট খুললে কী হয়? বাধ্যতামূলক কি?', en: 'What happens when I create an account? Is it required?' },
+    a: {
+      bn: 'একেবারেই বাধ্যতামূলক নয় — অ্যাকাউন্ট ছাড়াই পুরো প্ল্যাটফর্ম চলে। অ্যাকাউন্ট (ইমেইল বা Google) শুধু ডিভাইস-জুড়ে সিঙ্ক যোগ করে: সাইন-ইনের সময় ব্রাউজারের লোকাল প্রগ্রেস একবার ক্লাউডে তোলা হয় (ডুপ্লিকেট বাদ), পরের টেস্ট ও লেসন সরাসরি সিঙ্ক হয়। কোনো ট্র্যাকিং নেই; লোকাল ডেটা কখনো মুছে ফেলা হয় না।',
+      en: 'Not at all — the whole platform works without one. An account (email or Google) only adds cross-device sync: at sign-in your local progress is uploaded once (duplicates skipped), and later tests/lessons sync directly. No tracking; your local data is never deleted.',
     },
   },
   {

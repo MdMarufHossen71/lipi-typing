@@ -43,13 +43,18 @@ function getSegmenter(): Intl.Segmenter | null {
 
 /** Split a string into user-perceived characters (grapheme clusters). */
 export function segment(str: string): string[] {
+  // NFC-normalise first: the same visible character can be encoded as a
+  // precomposed code point (য় U+09DF) or as base+nukta (য + U+09BC) depending
+  // on the input source. Without normalisation, grapheme clusters compare as
+  // unequal strings despite looking identical.
+  const normalized = str.normalize('NFC')
   const seg = getSegmenter()
   if (seg) {
     const out: string[] = []
-    for (const { segment } of seg.segment(str)) out.push(segment)
+    for (const { segment } of seg.segment(normalized)) out.push(segment)
     return out
   }
-  return Array.from(str)
+  return Array.from(normalized)
 }
 
 /** Compare target and input grapheme-by-grapheme for live highlighting. */

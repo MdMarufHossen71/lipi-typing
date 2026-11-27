@@ -15,6 +15,25 @@ describe('segment', () => {
     // শি (শ+ি) and ক্ষা (ক্ষ+া) -> 2 graphemes
     expect(segment('শিক্ষা')).toEqual(['শি', 'ক্ষা'])
   })
+
+  it('normalises decomposed and precomposed nukta forms to the same grapheme', () => {
+    // য় can be encoded precomposed (U+09DF) or decomposed (য U+09AF + nukta U+09BC).
+    const decomposed = 'য\u09BC'
+    const precomposed = '\u09DF'
+    expect(decomposed).not.toBe(precomposed) // different encodings in…
+    expect(segment(decomposed)).toEqual(segment(precomposed)) // …same grapheme
+  })
+
+  it('scores decomposed target vs precomposed input as correct', () => {
+    // য় exists as a precomposed code point (U+09DF) and as a decomposed
+    // sequence (য U+09AF + nukta U+09BC). Some IMEs emit the precomposed
+    // form while the pools store the decomposed one; both must score equal.
+    const target = '\u09AF\u09BC' // decomposed য়
+    const input = '\u09DF' // precomposed য়
+    const cmp = compareChars(target, input)
+    expect(cmp.filter((c) => c.state === 'incorrect')).toHaveLength(0)
+    expect(cmp.filter((c) => c.state === 'correct')).toHaveLength(1)
+  })
 })
 
 describe('compareChars', () => {

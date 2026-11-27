@@ -1,10 +1,8 @@
-// Supabase client — typed, nullable, browser-only (publishable key is safe to
+// Supabase client — typed, browser-only (publishable key is safe to
 // expose; Row Level Security enforces per-user data access server-side).
 //
-// When VITE_SUPABASE_URL / VITE_SUPABASE_PUBLISHABLE_KEY are missing (local
-// dev without credentials, or a deployment without the vars), the app degrades
-// gracefully: auth UI is hidden and everything keeps working from localStorage.
-import { createClient } from '@supabase/supabase-js'
+// The @supabase/supabase-js import is dynamic (see loadSupabase below) —
+// only a type import appears at the top of this module.
 import type { SupabaseClient } from '@supabase/supabase-js'
 
 // Row shapes are `type` aliases (not interfaces): supabase-js's generic
@@ -139,16 +137,31 @@ export interface Database {
   }
 }
 
+// Supabase client — LAZY-LOADED. @supabase/supabase-js is ~240 KB minified;
+// importing it statically pulled it into the main chunk for every visitor.
+// It now lives in its own async chunk, fetched only when the env vars exist
+// AND auth/cloud features are actually used (guests never download it).
+
 const url = import.meta.env.VITE_SUPABASE_URL as string | undefined
 const publishableKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string | undefined
 
 export const isSupabaseConfigured = Boolean(url && publishableKey)
 
-export const supabase: SupabaseClient<Database> | null = isSupabaseConfigured
-  ? createClient<Database>(url as string, publishableKey as string)
-  : null
+let clientPromise: Promise<SupabaseClient<Database> | null> | null = null
 
-export function requireClient(): SupabaseClient<Database> {
-  if (!supabase) throw new Error('Supabase is not configured')
-  return supabase
+/** Load (and memoise) the Supabase client. Resolves to null when unconfigured
+ * — callers must treat that as "guest mode, no cloud". */
+export function loadSupabase(): Promise<SupabaseClient<Database> | null> {
+  if (!isSupabaseConfigured) return Promise.resolve(null)
+  if (!clientPromise) {
+    clientPromise = import('@supabase/supabase-js').then(({ createClient }) =>
+      createClient<Database>(url as string, publishableKey as string),
+    )
+  }
+  return clientPromise
+}
+
+export function requireClient(client: SupabaseClient<Database> | null): SupabaseClient<Database> {
+  if (!client) throw new Error('Supabase is not configured')
+  return client
 }
