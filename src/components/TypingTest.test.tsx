@@ -2,14 +2,19 @@ import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { TestResult } from '../types'
 import { I18nProvider } from '../i18n/I18nContext'
+import { AuthProvider } from '../contexts/AuthContext'
 import { bn } from '../i18n/bn'
 import { TypingTest } from './TypingTest'
 
 // The default interface language is Bangla, so labels come from the bn dictionary.
+// Without Supabase env vars AuthProvider settles into guest mode, which is
+// exactly the flow these tests exercise.
 function renderTest() {
   return render(
     <I18nProvider>
-      <TypingTest />
+      <AuthProvider>
+        <TypingTest />
+      </AuthProvider>
     </I18nProvider>,
   )
 }

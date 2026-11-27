@@ -30,3 +30,8 @@ dist-ssr
 
 coverage
 .zcode/
+
+.env*
+
+# Supabase CLI local state
+supabase/.temp/

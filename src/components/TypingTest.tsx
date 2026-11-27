@@ -12,10 +12,12 @@ import {
   Timer,
 } from 'lucide-react'
 import type { TestLang, TestMode, TestResult, TypingMethod } from '../types'
+import { useAuth } from '../contexts/AuthContext'
 import { useI18n } from '../i18n/I18nContext'
 import { compareChars, computeStats, performanceLevel, segment } from '../lib/typingEngine'
 import { anotherParagraph, pickText } from '../data/testTexts'
 import { saveTestResult } from '../lib/progress'
+import { saveTypingResultToCloud } from '../lib/cloudSync'
 import { Button, Card, SegmentedControl } from './ui'
 import { ProgressRing } from './ProgressRing'
 import { cn, formatDuration, formatNumber } from '../lib/utils'
@@ -36,6 +38,7 @@ const levelKey: Record<string, string> = {
 
 export function TypingTest() {
   const { t, lang } = useI18n()
+  const { user } = useAuth()
   const [phase, setPhase] = useState<Phase>('config')
   const [testLang, setTestLang] = useState<TestLang>('bn')
   const [method, setMethod] = useState<TypingMethod>('avro')
@@ -130,6 +133,11 @@ export function TypingTest() {
       wpm: stats.wpm,
       target: targetRef.current.slice(0, 160),
     })
+    // Signed-in users also get a cloud copy (fire-and-forget); the local
+    // record stays as the offline cache, and Account > Sync can retry gaps.
+    if (user) {
+      void saveTypingResultToCloud(user.id, saved).catch(() => {})
+    }
     setResult(saved)
     setPhase('finished')
   }

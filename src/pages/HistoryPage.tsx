@@ -1,10 +1,10 @@
 import { Link } from 'react-router-dom'
-import { History, Trash2 } from 'lucide-react'
+import { History, Loader2, Trash2 } from 'lucide-react'
 import { useI18n } from '../i18n/I18nContext'
 import { Seo } from '../components/Seo'
 import { Button, Card, EmptyState } from '../components/ui'
 import { clearTestHistory } from '../lib/progress'
-import { useTestHistory } from '../lib/completionStore'
+import { useUserData } from '../lib/userData'
 import { formatDate, formatDuration } from '../lib/utils'
 
 function methodLabel(r: { lang: string; method: string }, t: (k: string) => string): string {
@@ -15,7 +15,7 @@ function methodLabel(r: { lang: string; method: string }, t: (k: string) => stri
 
 export default function HistoryPage() {
   const { t } = useI18n()
-  const history = useTestHistory()
+  const { history, loading, error, retry } = useUserData()
 
   return (
     <>
@@ -40,8 +40,21 @@ export default function HistoryPage() {
           )}
         </div>
 
+        {error && (
+          <Card className="mt-6 flex flex-wrap items-center justify-between gap-3 border-red-200 bg-red-50/60 dark:border-red-900/50 dark:bg-red-900/10">
+            <span className="text-sm text-red-700 dark:text-red-300">{error}</span>
+            <Button variant="outline" onClick={retry}>
+              {t('auth.tryAgain')}
+            </Button>
+          </Card>
+        )}
+
         <div className="mt-6">
-          {history.length === 0 ? (
+          {loading && history.length === 0 ? (
+            <Card className="flex items-center gap-2 text-sm text-slate-400">
+              <Loader2 size={14} className="animate-spin" /> {t('common.loading')}
+            </Card>
+          ) : history.length === 0 && !error ? (
             <EmptyState
               icon={<History size={22} />}
               title={t('pages.history.empty')}
@@ -52,7 +65,7 @@ export default function HistoryPage() {
                 </Link>
               }
             />
-          ) : (
+          ) : history.length > 0 ? (
             <>
               {/* Mobile cards */}
               <div className="grid gap-3 sm:hidden">
@@ -111,7 +124,7 @@ export default function HistoryPage() {
                 </table>
               </Card>
             </>
-          )}
+          ) : null}
         </div>
       </div>
     </>

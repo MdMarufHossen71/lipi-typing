@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
-import { ChevronDown, Keyboard, Menu, X } from 'lucide-react'
+import { ChevronDown, Keyboard, LogOut, Menu, UserRound, X } from 'lucide-react'
 import { useI18n } from '../i18n/I18nContext'
 import { ThemeToggle } from './ThemeToggle'
 import { LanguageSwitcher } from './LanguageSwitcher'
+import { useAuth } from '../contexts/AuthContext'
 import { learnNav, mobileNavSections, moreNav, topNav } from '../data/nav'
 import type { NavItem } from '../data/nav'
 import { cn } from '../lib/utils'
@@ -50,6 +51,71 @@ function Dropdown({ label, items, active }: { label: string; items: NavItem[]; a
                 {t(it.key)}
               </NavLink>
             ))}
+          </div>
+        </>
+      )}
+    </div>
+  )
+}
+
+/** Sign in / sign up links for guests, avatar menu for signed-in users. */
+function AuthArea() {
+  const { t } = useI18n()
+  const { status, configured, user, profile, signOut } = useAuth()
+  const [open, setOpen] = useState(false)
+  const loc = useLocation()
+  useEffect(() => setOpen(false), [loc.pathname])
+
+  if (!configured || status === 'loading') return null
+
+  if (status === 'guest') {
+    return (
+      <div className="flex items-center gap-1.5">
+        <Link to="/login" className="rounded-lg px-2.5 py-1.5 text-sm text-slate-600 transition-colors hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800">
+          {t('nav.signInShort')}
+        </Link>
+        <Link to="/register" className="btn-primary rounded-lg px-3 py-1.5 text-sm">
+          {t('nav.signUpShort')}
+        </Link>
+      </div>
+    )
+  }
+
+  const displayName = profile?.display_name || user?.email?.split('@')[0] || '?'
+  const initial = displayName.trim().charAt(0).toUpperCase()
+
+  return (
+    <div className="relative">
+      <button
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+        aria-label={t('account.title')}
+        className="grid h-8 w-8 place-items-center rounded-full bg-gradient-to-br from-brand-500 to-brand-700 text-sm font-bold text-white shadow-pop transition-transform hover:scale-105"
+      >
+        {initial}
+      </button>
+      {open && (
+        <>
+          <button className="fixed inset-0 z-30 cursor-default" onClick={() => setOpen(false)} aria-hidden tabIndex={-1} />
+          <div className="absolute right-0 z-40 mt-2 w-56 animate-fadeIn rounded-xl border border-slate-200 bg-white p-1.5 shadow-card dark:border-slate-800 dark:bg-slate-900">
+            <div className="border-b border-slate-100 px-3 py-2 dark:border-slate-800">
+              <div className="truncate text-sm font-semibold">{displayName}</div>
+              {user?.email && (
+                <div className="truncate text-xs text-slate-400">{user.email}</div>
+              )}
+            </div>
+            <Link
+              to="/account"
+              className="mt-1 flex items-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-slate-100 dark:hover:bg-slate-800"
+            >
+              <UserRound size={14} /> {t('account.title')}
+            </Link>
+            <button
+              onClick={() => void signOut()}
+              className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
+            >
+              <LogOut size={14} /> {t('auth.signOut')}
+            </button>
           </div>
         </>
       )}
@@ -110,6 +176,7 @@ export function Navbar() {
         </nav>
 
         <div className="ml-auto flex items-center gap-1">
+          <AuthArea />
           <LanguageSwitcher />
           <ThemeToggle />
           <button
@@ -155,9 +222,45 @@ export function Navbar() {
                 ))}
               </div>
             ))}
+            <MobileAuthLinks />
           </div>
         </div>
       )}
     </header>
+  )
+}
+
+/** Drawer footer: account entry (or sign-in links) for signed-in users. */
+function MobileAuthLinks() {
+  const { t } = useI18n()
+  const { status, configured, user, profile } = useAuth()
+  if (!configured || status === 'loading') return null
+  const drawerLink =
+    'block rounded-lg px-2.5 py-1.5 text-sm text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800'
+  if (status === 'guest') {
+    return (
+      <div className="mb-3">
+        <div className="px-2 pb-1 text-xs font-semibold uppercase tracking-wide text-slate-400">
+          {t('account.title')}
+        </div>
+        <NavLink to="/login" className={drawerLink}>
+          <span className="block px-3 py-2">{t('nav.signInShort')}</span>
+        </NavLink>
+        <NavLink to="/register" className="btn-primary mx-2 mt-1 block text-center">
+          {t('nav.signUpShort')}
+        </NavLink>
+      </div>
+    )
+  }
+  const displayName = profile?.display_name || user?.email?.split('@')[0] || '?'
+  return (
+    <div className="mb-3">
+      <div className="px-2 pb-1 text-xs font-semibold uppercase tracking-wide text-slate-400">
+        {t('account.title')}
+      </div>
+      <NavLink to="/account" className={drawerLink}>
+        <span className="block px-3 py-2">{displayName}</span>
+      </NavLink>
+    </div>
   )
 }

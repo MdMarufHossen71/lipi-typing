@@ -3,7 +3,9 @@ import { CircleCheck } from 'lucide-react'
 import type { Lesson } from '../data/lessons/types'
 import type { TestLang } from '../types'
 import { useI18n } from '../i18n/I18nContext'
+import { useAuth } from '../contexts/AuthContext'
 import { markLessonComplete } from '../lib/progress'
+import { saveLessonCompletionToCloud } from '../lib/cloudSync'
 import { useCompletedLessonIds } from '../lib/completionStore'
 import { LessonView } from './LessonView'
 import { cn } from '../lib/utils'
@@ -19,11 +21,22 @@ interface LessonTrackProps {
 
 export function LessonTrack({ lessons, trackId, trackLang, backTo }: LessonTrackProps) {
   const { tr } = useI18n()
+  const { user } = useAuth()
   const [idx, setIdx] = useState(0)
   const lesson = lessons[idx]
   const fullId = `${trackId}:${lesson.id}`
   const completedIds = useCompletedLessonIds()
   const completed = completedIds.has(fullId)
+
+  function complete() {
+    const list = markLessonComplete(fullId, trackLang)
+    // Signed-in users also get a cloud copy (fire-and-forget); the local
+    // record stays and Account > Sync can retry gaps.
+    const rec = list.find((l) => l.id === fullId)
+    if (rec && user) {
+      void saveLessonCompletionToCloud(user.id, rec).catch(() => {})
+    }
+  }
 
   return (
     <div className="container-page py-8">
@@ -61,7 +74,7 @@ export function LessonTrack({ lessons, trackId, trackLang, backTo }: LessonTrack
             backTo={backTo}
             onPrev={idx > 0 ? () => setIdx(idx - 1) : undefined}
             onNext={idx < lessons.length - 1 ? () => setIdx(idx + 1) : undefined}
-            onComplete={() => markLessonComplete(fullId, trackLang)}
+            onComplete={complete}
             completed={completed}
           />
         </div>

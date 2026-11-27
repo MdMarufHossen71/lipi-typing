@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { RotateCcw, Shuffle } from 'lucide-react'
 import { useI18n } from '../i18n/I18nContext'
-import { Button, Card, SegmentedControl } from './ui'
+import { Card, SegmentedControl } from './ui'
 import { compareChars, segment } from '../lib/typingEngine'
 import { testTexts } from '../data/testTexts'
 import type { TestLang } from '../types'

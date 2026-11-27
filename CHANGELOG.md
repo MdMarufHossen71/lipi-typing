@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added — accounts & cloud sync (Supabase)
+- **Optional accounts**: email/password sign-up with full name, email confirmation, sign-in with show/hide password, Google OAuth (application flow implemented; provider configuration is a dashboard task), password recovery + update flow, account page with display-name editing and sign-out. Auth pages: `/login`, `/register`, `/forgot-password`, `/update-password`, `/auth/callback`, `/account` (guarded).
+- **Central AuthContext** with session restore, `onAuthStateChange` listener, lazy profile creation (covers users created before the migration) and stable bilingual error codes.
+- **Database**: `supabase/migrations/0001_init.sql` — `profiles`, `typing_results` (mirrors `TestResult`; `legacy_id` unique index for dedup), `lesson_progress` (unique per user+lesson), auto-profile trigger on `auth.users`, `updated_at` trigger, indexes, and **Row Level Security on every table** (select/insert/update/delete all restricted to `auth.uid()`).
+- **Cloud sync** (`src/lib/cloudSync.ts`): migration of localStorage progress to the cloud, deduplicated by `legacy_id` / `(user_id, lesson_id)` and idempotent on re-runs; local data is never deleted; failed cloud writes stay local and can be retried from Account → Sync local progress.
+- **Unified data hook** (`useUserData`): signed-in dashboards/history show cloud records merged over local-only ones; guests keep the localStorage stores unchanged.
+- **Guest-first**: with no Supabase env vars the app is 100% guest mode (auth UI hidden) — no crashes, no behaviour change.
+- Navbar avatar menu (profile, sign out) and sign-in/sign-up actions; dashboard guest invitation card.
+- `.env.example`; README Supabase/Google-OAuth setup checklist + troubleshooting guide.
+- 17 new tests (mocked Supabase client): auth state transitions, session restore, lazy profile creation, sign-in/sign-out, error-code mapping, registration validation, cloud-sync dedup/idempotency/error paths, guest invariance, callback error branch (73 total).
+
 ### Fixed (UI/UX audit, 2026-11-27)
 - **Lesson completion UI was stale**: marking a lesson complete wrote localStorage but the React UI (sidebar checkmarks, completed badge) only updated after navigating. Progress now flows through a reactive store (`useSyncExternalStore` + change events), so every view updates instantly.
 - **Typing-test timer drift**: elapsed time was accumulated from fixed 0.2 s interval ticks, which lagged real time whenever the browser throttled a background tab. Elapsed time is now derived from a wall-clock anchor; results are also guarded against double-saving (interval expiry + target-complete + Finish button race, and React StrictMode's double-invoked updaters).

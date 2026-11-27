@@ -1,12 +1,13 @@
 import { Link } from 'react-router-dom'
-import { BookOpen, Gauge, Target, Timer, TrendingUp } from 'lucide-react'
+import { BookOpen, CloudUpload, Gauge, Loader2, Target, Timer, TrendingUp } from 'lucide-react'
 import { useI18n } from '../i18n/I18nContext'
+import { useAuth } from '../contexts/AuthContext'
 import { Seo } from '../components/Seo'
 import { Button, Card, EmptyState, StatCard } from '../components/ui'
 import { ProgressRing } from '../components/ProgressRing'
 import { ActivityStrip, BarsRow, Sparkline } from '../components/charts'
-import { computeDashboardStats, getCompletedLessons, resetAllProgress } from '../lib/progress'
-import { useCompletedLessonIds, useTestHistory } from '../lib/completionStore'
+import { computeDashboardStats, resetAllProgress } from '../lib/progress'
+import { useUserData } from '../lib/userData'
 import { avroLessons } from '../data/lessons/avroLessons'
 import { bijoyLessons } from '../data/lessons/bijoyLessons'
 import { englishLessons } from '../data/lessons/englishLessons'
@@ -14,20 +15,21 @@ import { formatDate, formatDuration, formatNumber } from '../lib/utils'
 
 export default function DashboardPage() {
   const { t, lang } = useI18n()
-  const history = useTestHistory()
-  const completedIds = useCompletedLessonIds()
-  const stats = computeDashboardStats(history, getCompletedLessons())
+  const { status, configured } = useAuth()
+  const { history, completions, loading, error, retry } = useUserData()
+  const stats = computeDashboardStats(history, completions)
 
   const tracks = [
     { id: 'avro', lessons: avroLessons, to: '/avro' },
     { id: 'bijoy', lessons: bijoyLessons, to: '/bijoy' },
     { id: 'english', lessons: englishLessons, to: '/english' },
   ]
+  const completedIds = new Set(completions.map((c) => c.id))
   const recommended = tracks
     .flatMap((tr) => tr.lessons.map((l) => ({ tr, l })))
     .find(({ tr, l }) => !completedIds.has(`${tr.id}:${l.id}`))
 
-  if (stats.totalTests === 0 && stats.completedLessons === 0) {
+  if (stats.totalTests === 0 && stats.completedLessons === 0 && !loading && !error) {
     return (
       <>
         <Seo title={`${t('dashboard.title')} — ${t('brand.name')}`} />
@@ -76,6 +78,39 @@ export default function DashboardPage() {
         </div>
 
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {error && (
+            <Card className="col-span-full flex flex-wrap items-center justify-between gap-3 border-red-200 bg-red-50/60 dark:border-red-900/50 dark:bg-red-900/10">
+              <span className="text-sm text-red-700 dark:text-red-300">
+                {t('auth.errNetwork')} <span className="text-xs opacity-70">({error})</span>
+              </span>
+              <Button variant="outline" onClick={retry}>
+                {t('auth.tryAgain')}
+              </Button>
+            </Card>
+          )}
+          {configured && status === 'guest' && (
+            <Card className="col-span-full border-brand-200 bg-brand-50/50 dark:border-brand-900/40 dark:bg-brand-900/10">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <h2 className="flex items-center gap-1.5 text-sm font-semibold">
+                    <CloudUpload size={15} className="text-brand-600 dark:text-brand-300" />
+                    {t('dashboard.guestTitle')}
+                  </h2>
+                  <p className="mt-1 max-w-xl text-xs text-slate-500 dark:text-slate-400">
+                    {t('dashboard.guestDesc')}
+                  </p>
+                </div>
+                <Link to="/register" className="btn-primary">
+                  {t('dashboard.guestCta')}
+                </Link>
+              </div>
+            </Card>
+          )}
+          {loading && (
+            <Card className="col-span-full flex items-center gap-2 text-sm text-slate-400">
+              <Loader2 size={14} className="animate-spin" /> {t('common.loading')}
+            </Card>
+          )}
           <Card className="flex flex-col items-center justify-center">
             <ProgressRing value={stats.avgAccuracy} label={`${stats.avgAccuracy}%`} sublabel={t('dashboard.avgAccuracy')} />
           </Card>

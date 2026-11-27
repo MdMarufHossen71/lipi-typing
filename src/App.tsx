@@ -18,6 +18,12 @@ const AboutPage = lazy(() => import('./pages/AboutPage'))
 const ReferencesPage = lazy(() => import('./pages/ReferencesPage'))
 const ContactPage = lazy(() => import('./pages/ContactPage'))
 const NotFound = lazy(() => import('./pages/NotFound'))
+const LoginPage = lazy(() => import('./pages/LoginPage'))
+const RegisterPage = lazy(() => import('./pages/RegisterPage'))
+const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage'))
+const UpdatePasswordPage = lazy(() => import('./pages/UpdatePasswordPage'))
+const AuthCallbackPage = lazy(() => import('./pages/AuthCallbackPage'))
+const AccountPage = lazy(() => import('./pages/AccountPage'))
 
 function Loader() {
   return (
@@ -47,6 +53,12 @@ export default function App() {
           <Route path="/about" element={<AboutPage />} />
           <Route path="/references" element={<ReferencesPage />} />
           <Route path="/contact" element={<ContactPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/update-password" element={<UpdatePasswordPage />} />
+          <Route path="/auth/callback" element={<AuthCallbackPage />} />
+          <Route path="/account" element={<AccountPage />} />
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
