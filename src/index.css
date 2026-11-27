@@ -12,22 +12,43 @@
   }
   ::selection { @apply bg-brand-500/30; }
   :focus-visible { @apply outline-none ring-2 ring-brand-500 ring-offset-2 ring-offset-white dark:ring-offset-slate-950; }
+
+  /* Respect users who prefer minimal motion. */
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
 }
 
 @layer components {
   .container-page { @apply mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8; }
-  .card { @apply rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900; }
-  .btn { @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 disabled:cursor-not-allowed disabled:opacity-50; }
-  .btn-primary { @apply btn bg-brand-600 text-white hover:bg-brand-700 dark:hover:bg-brand-500; }
+  .card { @apply rounded-2xl border border-slate-200 bg-white shadow-card dark:border-slate-800 dark:bg-slate-900 dark:shadow-card-dark; }
+  .btn { @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 disabled:cursor-not-allowed disabled:opacity-50; }
+  .btn-primary { @apply btn bg-brand-600 text-white shadow-pop hover:bg-brand-700 active:scale-[.98] dark:hover:bg-brand-500; }
   .btn-ghost { @apply btn text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800; }
-  .btn-outline { @apply btn border border-slate-300 text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800; }
-  .input { @apply w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100; }
+  .btn-outline { @apply btn border border-slate-300 text-slate-700 hover:border-brand-400 hover:bg-brand-50/50 hover:text-brand-700 dark:border-slate-700 dark:text-slate-200 dark:hover:border-brand-500 dark:hover:bg-brand-900/20 dark:hover:text-brand-200; }
+  .btn-danger { @apply btn border border-red-200 text-red-700 hover:bg-red-50 dark:border-red-900/50 dark:text-red-300 dark:hover:bg-red-900/20; }
+  .input { @apply w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100; }
+  .label { @apply mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300; }
   .badge { @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium; }
   .badge-brand { @apply badge bg-brand-100 text-brand-700 dark:bg-brand-900/40 dark:text-brand-300; }
   .badge-muted { @apply badge bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300; }
   .badge-green { @apply badge bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300; }
   .badge-amber { @apply badge bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300; }
+  .badge-teal { @apply badge bg-teal-100 text-teal-700 dark:bg-teal-900/40 dark:text-teal-300; }
   .prose-bn { @apply leading-relaxed; }
+
+  /* Decorative gradient surfaces (hero, CTA banners). */
+  .surface-hero {
+    @apply bg-gradient-to-b from-brand-50 via-white to-white dark:from-brand-950/40 dark:via-slate-950 dark:to-slate-950;
+  }
+  .surface-cta {
+    @apply rounded-2xl bg-gradient-to-br from-brand-600 to-brand-800 text-white shadow-pop;
+  }
 }
 
 @layer utilities {
@@ -35,4 +56,7 @@
   .scrollbar-thin::-webkit-scrollbar { height: 8px; width: 8px; }
   .scrollbar-thin::-webkit-scrollbar-thumb { @apply rounded bg-slate-300 dark:bg-slate-700; }
   .scrollbar-thin::-webkit-scrollbar-track { @apply bg-transparent; }
+  .text-gradient {
+    @apply bg-gradient-to-r from-brand-600 via-brand-500 to-accent-500 bg-clip-text text-transparent;
+  }
 }
