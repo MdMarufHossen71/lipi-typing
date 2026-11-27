@@ -73,7 +73,7 @@ export const en: Record<string, string> = {
     'Lipi is a complete typing learning platform — Avro Phonetic, Bijoy keyboard, Bijoy Bayanno guide, interactive keyboards, step-by-step lessons, practice and accurate typing tests in one place.',
   'home.heroCta': 'Start learning now',
   'home.heroCta2': 'Take a typing test',
-  'home.statsLessons': '30+',
+  'home.statsLessons': '18',
   'home.statsLessonsLabel': 'Lessons',
   'home.statsLanguages': '2',
   'home.statsLanguagesLabel': 'Languages (more coming)',
@@ -115,6 +115,17 @@ export const en: Record<string, string> = {
   'home.ctaSubtitle':
     'Free, open source, no account required. Runs fast even on low-end PCs.',
   'home.ctaButton': 'Browse lessons',
+  'home.stepsTitle': 'How it works',
+  'home.stepsSubtitle': 'Three simple steps from your first keystroke to professional speed.',
+  'home.step1Title': 'Pick a track',
+  'home.step1Desc': 'Avro Phonetic, Bijoy or English QWERTY — learn in the language you want.',
+  'home.step2Title': 'Learn and practise',
+  'home.step2Desc': 'Short lessons with examples, guided practice and quizzes in every lesson.',
+  'home.step3Title': 'Test and track',
+  'home.step3Desc': 'Measure your CPM/WPM and accuracy, and watch your progress grow.',
+  'home.lessonsCount': '{n} lessons',
+  'home.progressLabel': '{n}% complete',
+  'home.guideBadge': 'Guide',
 
   // Typing test
   'test.title': 'Typing Test',

@@ -8,11 +8,11 @@ export function Footer() {
   const year = new Date().getFullYear()
   return (
     <footer className="mt-12 border-t border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950">
-      <div className="container-page grid gap-6 py-8 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="container-page grid gap-8 py-10 sm:grid-cols-2 lg:grid-cols-4">
         <div className="sm:col-span-2 lg:col-span-2">
           <div className="flex items-center gap-2 font-semibold">
-            <span className="grid h-7 w-7 place-items-center rounded-lg bg-brand-600 text-white">
-              <Keyboard size={16} />
+            <span className="grid h-7 w-7 place-items-center rounded-lg bg-gradient-to-br from-brand-500 to-brand-700 text-white">
+              <Keyboard size={15} />
             </span>
             {t('brand.name')}
           </div>
@@ -22,10 +22,10 @@ export function Footer() {
         </div>
         <div>
           <div className="text-sm font-semibold">{t('footer.product')}</div>
-          <ul className="mt-2 space-y-1 text-sm text-slate-500 dark:text-slate-400">
+          <ul className="mt-2 space-y-1.5 text-sm text-slate-500 dark:text-slate-400">
             {topNav.slice(0, 4).map((it) => (
               <li key={it.to}>
-                <Link to={it.to} className="hover:text-brand-600 dark:hover:text-brand-400">
+                <Link to={it.to} className="transition-colors hover:text-brand-600 dark:hover:text-brand-400">
                   {t(it.key)}
                 </Link>
               </li>
@@ -34,16 +34,16 @@ export function Footer() {
         </div>
         <div>
           <div className="text-sm font-semibold">{t('footer.resources')}</div>
-          <ul className="mt-2 space-y-1 text-sm text-slate-500 dark:text-slate-400">
+          <ul className="mt-2 space-y-1.5 text-sm text-slate-500 dark:text-slate-400">
             {learnNav.slice(0, 4).map((it) => (
               <li key={it.to}>
-                <Link to={it.to} className="hover:text-brand-600 dark:hover:text-brand-400">
+                <Link to={it.to} className="transition-colors hover:text-brand-600 dark:hover:text-brand-400">
                   {t(it.key)}
                 </Link>
               </li>
             ))}
             <li>
-              <Link to="/references" className="hover:text-brand-600 dark:hover:text-brand-400">
+              <Link to="/references" className="transition-colors hover:text-brand-600 dark:hover:text-brand-400">
                 {t('nav.references')}
               </Link>
             </li>
