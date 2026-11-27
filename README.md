@@ -32,6 +32,12 @@ all progress is stored locally in your browser.
   primary metric for Bangla** — WPM is shown too, but a Bangla "word" is
   ambiguous, so CPM is the reliable number.
 
+## Screenshots
+
+| Home | Typing Test | Interactive Keyboard |
+| --- | --- | --- |
+| ![Home page — Bangla UI with course cards](docs/screenshots/home.png) | ![Typing test config — language, method, mode, duration](docs/screenshots/typing-test.png) | ![Interactive keyboard with finger colour guide](docs/screenshots/keyboard.png) |
+
 ## Tech stack
 
 React 19 · TypeScript (strict) · Vite 8 · Tailwind CSS 3 · React Router 6 ·
