@@ -14,7 +14,7 @@ import {
 } from '../data/avroLayout'
 
 function AvroPractice() {
-  const { t, lang } = useI18n()
+  const { lang } = useI18n()
   const [roman, setRoman] = useState('bangla')
   const out = avroConvert(roman)
   return (

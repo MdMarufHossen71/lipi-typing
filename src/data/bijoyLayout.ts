@@ -8,7 +8,7 @@
 // uses an ANSI/font encoding (NOT Unicode) and is NOT what this mapping shows.
 // See the Bijoy Bayanno Guide page for ANSI vs Unicode details.
 
-import type { Finger, LayoutKey } from './qwertyLayout'
+import type { LayoutKey } from './qwertyLayout'
 
 export const bijoyRows: LayoutKey[][] = [
   // Row 0 — number row
