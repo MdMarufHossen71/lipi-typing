@@ -18,6 +18,9 @@ export const testTexts: Record<TestLang, TextPool> = {
       'প্রতিদিন অল্প সময় অনুশীলন করলেও টাইপিংয়ে দক্ষতা বাড়ে। সঠিক আঙুল বিন্যাস ও আসন ভঙ্গি মেনে চললে দ্রুত গতি অর্জন সম্ভব। ধৈর্য ধরে অনুশীলনই সফলতার চাবিকাঠি।',
       'বাংলাদেশের জাতীয় কীবোর্ড লেআউট হিসেবে বিজয় স্বীকৃত। বাংলাদেশ কম্পিউটার কাউন্সিল কর্তৃক এটি জাতীয় লেআউট হিসেবে ঘোষিত। ইউনিকোড মোডে টাইপ করলে সব ডিভাইসে সঠিকভাবে দেখা যায়।',
       'ভাষা কেবল যোগাযোগের মাধ্যম নয়, এটি একটি জাতির সংস্কৃতি ও চিন্তার বাহক। মাতৃভাষায় চিন্তা করা ও লেখা মানুষের সৃজনশীলতা বাড়ায়। তাই মাতৃভাষার চর্চা অপরিহার্য।',
+      'বই পড়া জ্ঞানের সবচেয়ে সহজ পথ। একটি ভালো বই পাঠককে অচেনা জগতের দরজা খুলে দেয়। প্রতিদিন অল্প করে হলেও বই পড়ার অভ্যাস গড়ে তুলুন, জ্ঞানের ভাণ্ডার ক্রমাগত বাড়বে।',
+      'বর্ষা এলে প্রকৃতি যেন নতুন জীবন পায়। আকাশ থেকে ঝরে পড়ে বৃষ্টির ফোঁটা, নদীতে বাড়ে পানি, গ্রামের পথঘর ভিজে যায়। বর্ষার সৌন্দর্য উপভোগ করতে চাইলে জানালার পাশে বসে গরম চা খান।',
+      'কম্পিউটার আজ আমাদের দৈনন্দিন জীবনের অবিচ্ছেদ্য অংশ। অফিস, শিক্ষা, চিকিৎসা কিংবা বিনোদন — সব ক্ষেত্রেই কম্পিউটার ব্যবহার হচ্ছে। দ্রুত ও নির্ভুল টাইপিং শিখলে কাজের গতি ও মান দুটোই বাড়ে।',
     ],
     sentences: [
       'আমি বাংলা ভাষায় কথা বলি।',
@@ -28,6 +31,8 @@ export const testTexts: Record<TestLang, TextPool> = {
       'নিয়মিত অনুশীলনই দক্ষতার চাবি।',
       'সততা সর্বোত্তম নীতি।',
       'সময়ের এক ফোঁড় সেই রাখে দশ।',
+      'বর্ষা মানেই প্রকৃতির নতুন জীবন।',
+      'কম্পিউটার শিক্ষা আজ অপরিহার্য।',
     ],
     words: [
       'বাংলা', 'দেশ', 'শিক্ষা', 'প্রযুক্তি', 'কম্পিউটার', 'কীবোর্ড', 'অনুশীলন',
@@ -46,6 +51,9 @@ export const testTexts: Record<TestLang, TextPool> = {
       'Typing speed is measured in words per minute, but accuracy matters just as much. A good typist balances both speed and precision. Practice a little every day and you will see steady improvement over time.',
       'Learning to type properly begins with correct finger placement. The home row keys are the foundation. Once your fingers know where to go without looking, your speed will increase naturally.',
       'Bangla and English are the two main languages taught on this platform. Start with short sessions, focus on accuracy first, then build speed. Consistency is far more important than long, tiring sessions.',
+      'Keyboard shortcuts can save you hours every week. Learn a few at a time: copy, paste, undo and switching between windows. When shortcuts become muscle memory, your hands barely leave the keys.',
+      'Reading a good book opens the door to an unfamiliar world. Even twenty minutes a day builds vocabulary, focus and imagination. Choose something you genuinely enjoy, and the habit will sustain itself.',
+      'Unicode makes it possible for Bangla text to appear correctly on every device and operating system. Always prefer Unicode over legacy font encodings, because legacy files break when fonts are missing.',
     ],
     sentences: [
       'Practice makes perfect.',
@@ -56,6 +64,8 @@ export const testTexts: Record<TestLang, TextPool> = {
       'Consistency beats intensity.',
       'Slow is smooth, and smooth is fast.',
       'Stay calm and keep typing.',
+      'Short daily sessions beat long rare ones.',
+      'Unicode text works everywhere, on every device.',
     ],
     words: [
       'type', 'keyboard', 'practice', 'accuracy', 'speed', 'language', 'finger',

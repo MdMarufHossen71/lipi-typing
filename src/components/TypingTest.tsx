@@ -52,11 +52,17 @@ export function TypingTest() {
   const targetRef = useRef('')
   const inputValRef = useRef('')
   const elapsedRef = useRef(0)
-  const cfgRef = useRef({ testLang, method, mode, durationSec })
+  // "Custom" stores durationSec = 0; the real length is then customMin minutes.
+  const effectiveDuration = durationSec === 0 ? customMin * 60 : durationSec
+  // Bangla is typed with Avro or Bijoy; English text with the QWERTY layout.
+  const methodOptions: TypingMethod[] =
+    testLang === 'en' ? ['english'] : METHODS.filter((m) => m !== 'english')
+
+  const cfgRef = useRef({ testLang, method, mode, durationSec, effectiveDuration })
 
   useEffect(() => {
-    cfgRef.current = { testLang, method, mode, durationSec }
-  }, [testLang, method, mode, durationSec])
+    cfgRef.current = { testLang, method, mode, durationSec, effectiveDuration }
+  }, [testLang, method, mode, durationSec, effectiveDuration])
   useEffect(() => {
     targetRef.current = target
   }, [target])
@@ -68,7 +74,6 @@ export function TypingTest() {
   }, [elapsed])
 
   const isTimed = mode === 'timed'
-  const effectiveDuration = durationSec === 0 ? customMin * 60 : durationSec
   const timeLeft = Math.max(0, effectiveDuration - elapsed)
 
   const live = useMemo(
@@ -80,6 +85,14 @@ export function TypingTest() {
 
   function focusInput() {
     setTimeout(() => inputEl.current?.focus(), 0)
+  }
+
+  // The saved method must match the language, otherwise the dashboard's
+  // per-method best speeds would mix English and Bangla results.
+  function pickTestLang(v: string) {
+    const next = v as TestLang
+    setTestLang(next)
+    setMethod((m) => (next === 'en' ? 'english' : m === 'english' ? 'avro' : m))
   }
 
   function start() {
@@ -103,7 +116,7 @@ export function TypingTest() {
       lang: cfg.testLang,
       method: cfg.method,
       mode: cfg.mode,
-      durationSec: cfg.mode === 'timed' ? cfg.durationSec : Math.round(ev),
+      durationSec: cfg.mode === 'timed' ? cfg.effectiveDuration : Math.round(ev),
       elapsedSec: Math.round(ev),
       totalTyped: stats.totalTyped,
       correct: stats.correct,
@@ -121,11 +134,12 @@ export function TypingTest() {
     if (phase !== 'running') return
     const id = setInterval(() => {
       setElapsed((e) => {
+        const cfg = cfgRef.current
         const next = e + 0.2
-        if (cfgRef.current.mode === 'timed' && next >= cfgRef.current.durationSec) {
+        if (cfg.mode === 'timed' && next >= cfg.effectiveDuration) {
           clearInterval(id)
-          finish(cfgRef.current.durationSec)
-          return cfgRef.current.durationSec
+          finish(cfg.effectiveDuration)
+          return cfg.effectiveDuration
         }
         return next
       })
@@ -213,14 +227,14 @@ export function TypingTest() {
                 { v: 'bn', label: t('common.bangla') },
                 { v: 'en', label: t('common.english') },
               ]}
-              onChange={(v) => setTestLang(v as TestLang)}
+              onChange={pickTestLang}
             />
           </Field>
 
           <Field label={t('test.method')}>
             <Pills
               value={method}
-              options={METHODS.map((m) => ({
+              options={methodOptions.map((m) => ({
                 v: m,
                 label: m === 'avro' ? t('test.mAvro') : m === 'bijoy' ? t('test.mBijoy') : t('test.mEnglish'),
               }))}
@@ -415,6 +429,7 @@ function Pills({
         <button
           key={o.v}
           onClick={() => onChange(o.v)}
+          aria-pressed={value === o.v}
           className={cn(
             'rounded-lg border px-3 py-1.5 text-sm transition-colors',
             value === o.v

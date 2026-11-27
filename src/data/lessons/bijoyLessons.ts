@@ -30,6 +30,22 @@ export const bijoyLessons: Lesson[] = [
       { bn: 'ANSI Bijoy ফন্টে লেখা টেক্সট ইউনিকোড মনে করা।', en: 'Assuming ANSI Bijoy-font text is Unicode.' },
     ],
     practiceText: { bn: 'ব ক ত দ', en: 'ব ক ত দ (type with H J K L)' },
+    quiz: [
+      {
+        q: { bn: 'Bijoy-তে "J" কী কোন বাংলা অক্ষর দেয়?', en: 'Which Bangla letter does the J key give in Bijoy?' },
+        options: [{ bn: 'ক', en: 'ক' }, { bn: 'ত', en: 'ত' }, { bn: 'ব', en: 'ব' }],
+        answer: 0,
+      },
+      {
+        q: { bn: 'Bijoy কোন ধরনের লেআউট?', en: 'What kind of layout is Bijoy?' },
+        options: [
+          { bn: 'নির্দিষ্ট কী-ম্যাপিং (প্রতিটি কী-তে একটি অক্ষর)', en: 'A fixed key mapping (one character per key)' },
+          { bn: 'ফনেটিক (উচ্চারণ ইংরেজিতে লিখলে বাংলা হয়)', en: 'Phonetic (type pronunciation in English letters)' },
+          { bn: 'মাউস দিয়ে অক্ষর বাছাইয়ের পদ্ধতি', en: 'A mouse-driven character picker' },
+        ],
+        answer: 0,
+      },
+    ],
   },
   {
     id: 'bijoy-2', level: 'beginner',
@@ -57,6 +73,22 @@ export const bijoyLessons: Lesson[] = [
       { bn: 'G (হসন্ত) সাধারণ অক্ষর মনে করা।', en: 'Thinking G (hasant) is a regular letter.' },
     ],
     practiceText: { bn: 'ব ক ত দ ভ খ থ ধ', en: 'ব ক ত দ ভ খ থ ধ (H J K L, Shift+H J K L)' },
+    quiz: [
+      {
+        q: { bn: 'হসন্ত (্) কোন কী-তে বসানো?', en: 'Which key holds hasant (্)?' },
+        options: [{ bn: 'G', en: 'G' }, { bn: 'F', en: 'F' }, { bn: 'H', en: 'H' }],
+        answer: 0,
+      },
+      {
+        q: { bn: 'Bijoy-তে ই-কার (ি) কোথায় টাইপ করতে হয়?', en: 'Where is the i-kar (ি) typed in Bijoy?' },
+        options: [
+          { bn: 'ব্যঞ্জনের আগে (প্রি-বেস)', en: 'Before the consonant (pre-base)' },
+          { bn: 'ব্যঞ্জনের পরে', en: 'After the consonant' },
+          { bn: 'যেকোনো সময়, ফল একই', en: 'Any time — the result is the same' },
+        ],
+        answer: 0,
+      },
+    ],
   },
   {
     id: 'bijoy-3', level: 'intermediate',
@@ -82,6 +114,13 @@ export const bijoyLessons: Lesson[] = [
       { bn: 'য (W) ও য় (Shift+W) গুলিয়ে ফেলা।', en: 'Mixing য (W) and য় (Shift+W).' },
     ],
     practiceText: { bn: 'প ট চ জ হ গ ফ ঠ ছ ঝ ঘ', en: 'প ট চ জ হ গ ফ ঠ ছ ঝ ঘ' },
+    quiz: [
+      {
+        q: { bn: 'Bijoy-তে Shift+Y কী দিলে কী আসে?', en: 'What does Shift+Y give in Bijoy?' },
+        options: [{ bn: 'চ', en: 'চ' }, { bn: 'ছ', en: 'ছ' }, { bn: 'ঝ', en: 'ঝ' }],
+        answer: 1,
+      },
+    ],
   },
   {
     id: 'bijoy-4', level: 'intermediate',
@@ -108,6 +147,13 @@ export const bijoyLessons: Lesson[] = [
       { bn: 'স (N), ষ (Shift+N), শ (Shift+M) গুলিয়ে ফেলা।', en: 'Mixing স, ষ, শ.' },
     ],
     practiceText: { bn: 'র ন স ম ল ণ ষ শ ১২৩ ৳', en: 'র ন স ম ল ণ ষ শ ১২৩ ৳' },
+    quiz: [
+      {
+        q: { bn: 'Bijoy-তে টাকা চিহ্ন (৳) কীভাবে টাইপ করা হয়?', en: 'How is the Taka sign (৳) typed in Bijoy?' },
+        options: [{ bn: 'Shift+4', en: 'Shift+4' }, { bn: '4', en: '4' }, { bn: 'Shift+8', en: 'Shift+8' }],
+        answer: 0,
+      },
+    ],
   },
   {
     id: 'bijoy-5', level: 'advanced',
@@ -134,6 +180,13 @@ export const bijoyLessons: Lesson[] = [
       { bn: 'র-ফলা ও য-ফলা গুলিয়ে ফেলা।', en: 'Mixing r-phala and ya-phala.' },
     ],
     practiceText: { bn: 'ক্ত প্র ক্ষ জ্ঞ ন্ত স্ত', en: 'ক্ত প্র ক্ষ জ্ঞ ন্ত স্ত' },
+    quiz: [
+      {
+        q: { bn: '"ক্ত" যুক্তাক্ষর কীভাবে টাইপ করা হয়?', en: 'How is the conjunct "ক্ত" typed?' },
+        options: [{ bn: 'J G K (ক + ্ + ত)', en: 'J G K (ক + ্ + ত)' }, { bn: 'J K (ক ত পরপর)', en: 'J K (ক then ত)' }, { bn: 'Shift+J Shift+K', en: 'Shift+J Shift+K' }],
+        answer: 0,
+      },
+    ],
   },
   {
     id: 'bijoy-6', level: 'professional',
@@ -161,5 +214,12 @@ export const bijoyLessons: Lesson[] = [
       bn: 'আমার সোনার বাংলা, আমি তোমায় ভালোবাসি। শিক্ষা ও প্রযুক্তি জাতির মেরুদণ্ড।',
       en: 'আমার সোনার বাংলা, আমি তোমায় ভালোবাসি। শিক্ষা ও প্রযুক্তি জাতির মেরুদণ্ড।',
     },
+    quiz: [
+      {
+        q: { bn: 'দাঁড়ি (।) কোন কী দিয়ে টাইপ হয়?', en: 'Which key types the dari (।)?' },
+        options: [{ bn: 'Shift+G', en: 'Shift+G' }, { bn: 'G', en: 'G' }, { bn: 'Shift+D', en: 'Shift+D' }],
+        answer: 0,
+      },
+    ],
   },
 ]

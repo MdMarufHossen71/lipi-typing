@@ -123,6 +123,18 @@ export const avroExampleWords: AvroExampleWord[] = [
       en: 'Full Avro engine uses য়; the simplified converter may differ.',
     },
   },
+  { roman: 'amader', bangla: 'আমাদের' },
+  { roman: 'amake', bangla: 'আমাকে' },
+  { roman: 'tomake', bangla: 'তোমাকে' },
+  { roman: 'akash', bangla: 'আকাশ' },
+  { roman: 'bidya', bangla: 'বিদ্যা' },
+  { roman: 'Dhaka', bangla: 'ঢাকা', note: { bn: 'বড় হাতের D → ঢ (ছোট d দিলে দ)', en: 'Capital D → ঢ (lowercase d gives দ)' } },
+  { roman: 'bangladesher', bangla: 'বাংলাদেশের' },
+  { roman: 'pakhir', bangla: 'পাখির' },
+  { roman: 'hater', bangla: 'হাতের' },
+  { roman: 'bikel', bangla: 'বিকেল' },
+  { roman: 'dupur', bangla: 'দুপুর' },
+  { roman: 'bhalo', bangla: 'ভালো' },
 ]
 
 // --- Simplified learning converter (see honesty note at top of file) ---
@@ -180,6 +192,18 @@ export function avroConvert(input: string): string {
       lastCons = true
       i++
       continue
+    }
+
+    // Diphthong kars (ৈ, ৌ) — must match before the single-letter 'o' rule,
+    // otherwise "koi" would come out as ক+ো+ই instead of কৈ.
+    if (s.startsWith('oi', i) || s.startsWith('ou', i)) {
+      const dv = vowelMap.find((x) => x.p === s.slice(i, i + 2))
+      if (dv) {
+        out += lastCons ? dv.kar : dv.indep
+        lastCons = false
+        i += 2
+        continue
+      }
     }
 
     // 'o' lowercase (not in vowel table to control its dual behaviour)

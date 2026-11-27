@@ -1,0 +1,17 @@
+{
+  "name": "লিপি — Lipi Typing Academy",
+  "short_name": "লিপি",
+  "description": "Bangla & English typing learning platform — Avro Phonetic, Bijoy, lessons, practice and typing tests.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#2563eb",
+  "lang": "bn",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

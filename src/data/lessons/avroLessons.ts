@@ -40,6 +40,11 @@ export const avroLessons: Lesson[] = [
         options: [{ bn: 'চ', en: 'চ' }, { bn: 'ছ', en: 'ছ' }, { bn: 'জ', en: 'জ' }],
         answer: 0,
       },
+      {
+        q: { bn: '"b" দিয়ে কোন বাংলা অক্ষর হয়?', en: 'Which Bangla letter does "b" produce?' },
+        options: [{ bn: 'ভ', en: 'ভ' }, { bn: 'প', en: 'প' }, { bn: 'ব', en: 'ব' }],
+        answer: 2,
+      },
     ],
   },
   {
@@ -72,6 +77,13 @@ export const avroLessons: Lesson[] = [
       { bn: 'ph আর f গুলিয়ে ফেলা — দুটোই ফ দেয়।', en: 'Mixing ph and f — both give ফ.' },
     ],
     practiceText: { bn: 'k kh g gh c ch j jh t th d dh n p b m r l s h', en: 'k kh g gh c ch j jh t th d dh n p b m r l s h' },
+    quiz: [
+      {
+        q: { bn: '"kh" দিয়ে কোন বাংলা অক্ষর হয়?', en: 'Which Bangla letter does "kh" produce?' },
+        options: [{ bn: 'ক', en: 'ক' }, { bn: 'খ', en: 'খ' }, { bn: 'ক্ষ', en: 'ক্ষ' }],
+        answer: 1,
+      },
+    ],
   },
   {
     id: 'avro-3',
@@ -107,6 +119,11 @@ export const avroLessons: Lesson[] = [
         options: [{ bn: 'কী', en: 'কী' }, { bn: 'কি', en: 'কি' }, { bn: 'কৈ', en: 'কৈ' }],
         answer: 1,
       },
+      {
+        q: { bn: '"ma" টাইপ করলে কী হবে?', en: 'What does typing "ma" produce?' },
+        options: [{ bn: 'মা', en: 'মা' }, { bn: 'মি', en: 'মি' }, { bn: 'মে', en: 'মে' }],
+        answer: 0,
+      },
     ],
   },
   {
@@ -139,6 +156,13 @@ export const avroLessons: Lesson[] = [
       { bn: 'chinta লিখলে ছিন্তা হয় (ch→ছ) — চিন্তা চাইলে cinta লিখুন।', en: 'chinta gives ছিন্তা (ch→ছ) — use cinta for চিন্তা.' },
     ],
     practiceText: { bn: 'kt nt st gg kkh shikkha biggan cinta', en: 'kt nt st gg kkh shikkha biggan cinta' },
+    quiz: [
+      {
+        q: { bn: '"kkh" দিয়ে কোন যুক্তাক্ষর হয়?', en: 'Which conjunct does "kkh" produce?' },
+        options: [{ bn: 'ক্ক', en: 'ক্ক' }, { bn: 'ক্ষ', en: 'ক্ষ' }, { bn: 'খ্য', en: 'খ্য' }],
+        answer: 1,
+      },
+    ],
   },
   {
     id: 'avro-5',
@@ -165,6 +189,13 @@ export const avroLessons: Lesson[] = [
       { bn: 'বিরতি চেয়ে সরাসরি । চাপা — ডট দিন।', en: 'Trying to type । directly — use a dot instead.' },
     ],
     practiceText: { bn: 'amar 2024 takar biki b.', en: 'amar 2024 takar biki b.' },
+    quiz: [
+      {
+        q: { bn: '"2024" টাইপ করলে কী আসে?', en: 'What does typing "2024" produce?' },
+        options: [{ bn: '২০২৪', en: '২০২৪' }, { bn: '2024', en: '2024' }, { bn: '২-০-২-৪', en: '২-০-২-৪' }],
+        answer: 0,
+      },
+    ],
   },
   {
     id: 'avro-6',
@@ -180,7 +211,10 @@ export const avroLessons: Lesson[] = [
     },
     examples: [
       { input: 'amar sonar bangla', output: 'আমার সোনার বাংলা' },
-      { input: 'shikkha o projukti', output: 'শিক্ষা ও প্রযুক্তি' },
+      // Not 'projukti': the simplified converter cannot reproduce প্রযুক্তি
+      // (real Avro gets it from dictionary rules). Use verified words only —
+      // guarded by the lesson-example test in avroLayout.test.ts.
+      { input: 'shikkha o biggan', output: 'শিক্ষা ও বিজ্ঞান' },
     ],
     instructions: [
       { bn: 'নিচের অনুচ্ছেদ Avro (বা এই প্ল্যাটফর্মের সরল কনভার্টার) দিয়ে টাইপ করুন।', en: 'Type the paragraph below using Avro (or this platform’s simplified converter).' },
@@ -195,5 +229,12 @@ export const avroLessons: Lesson[] = [
       bn: 'amar sonar bangla ami tomay bhalobashi shikkha o projukti banglar mukti',
       en: 'amar sonar bangla ami tomay bhalobashi shikkha o projukti banglar mukti',
     },
+    quiz: [
+      {
+        q: { bn: 'সরল কনভার্টারে "amar sonar bangla" লিখলে কী আসে?', en: 'What does the simplified converter give for "amar sonar bangla"?' },
+        options: [{ bn: 'আমার সোনার বাংলা', en: 'আমার সোনার বাংলা' }, { bn: 'আমার শোনার বাংলা', en: 'আমার শোনার বাংলা' }, { bn: 'আমার সোনার বাঙলা', en: 'আমার সোনার বাঙলা' }],
+        answer: 0,
+      },
+    ],
   },
 ]

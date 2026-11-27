@@ -28,6 +28,13 @@ export const englishLessons: Lesson[] = [
       { bn: 'চোখ দিয়ে কী খোঁজা।', en: 'Looking at the keys.' },
     ],
     practiceText: { bn: 'f f j j d d k k', en: 'f f j j d d k k' },
+    quiz: [
+      {
+        q: { bn: 'টাচ টাইপিংয়ে বাম হাতের আঙুলগুলো কোন কী-তে থাকে?', en: 'Which keys do the left-hand fingers rest on in touch typing?' },
+        options: [{ bn: 'A S D F', en: 'A S D F' }, { bn: 'Q W E R', en: 'Q W E R' }, { bn: 'Z X C V', en: 'Z X C V' }],
+        answer: 0,
+      },
+    ],
   },
   {
     id: 'en-2', level: 'beginner',
@@ -53,6 +60,13 @@ export const englishLessons: Lesson[] = [
       { bn: 'একই আঙুল দিয়ে একাধিক কী চাপা।', en: 'Using one finger for multiple keys.' },
     ],
     practiceText: { bn: 'sad fad dad lad jak fad glass glad', en: 'sad fad dad lad jak fad glass glad' },
+    quiz: [
+      {
+        q: { bn: '"G" কী কোন আঙুল দিয়ে চাপতে হয়?', en: 'Which finger presses the G key?' },
+        options: [{ bn: 'বাম তর্জনী (প্রসারিত)', en: 'Left index (extended)' }, { bn: 'ডান তর্জনী (প্রসারিত)', en: 'Right index (extended)' }, { bn: 'বাম মধ্যমা', en: 'Left middle' }],
+        answer: 0,
+      },
+    ],
   },
   {
     id: 'en-3', level: 'intermediate',
@@ -75,6 +89,13 @@ export const englishLessons: Lesson[] = [
       { bn: 'আঙুল হোম ছেড়ে অন্য জায়গায় স্থায়ী হয়ে যাওয়া।', en: 'Fingers drifting from home position.' },
     ],
     practiceText: { bn: 'the quick brown fox type write quote', en: 'the quick brown fox type write quote' },
+    quiz: [
+      {
+        q: { bn: '"Q" কী কোন আঙুল দিয়ে চাপা হয়?', en: 'Which finger presses the Q key?' },
+        options: [{ bn: 'বাম কনিকা', en: 'Left pinky' }, { bn: 'বাম অনামিকা', en: 'Left ring' }, { bn: 'ডান কনিকা', en: 'Right pinky' }],
+        answer: 0,
+      },
+    ],
   },
   {
     id: 'en-4', level: 'intermediate',
@@ -98,6 +119,13 @@ export const englishLessons: Lesson[] = [
       { bn: 'নম্বর রো-তে চোখ দিয়ে খোঁজা।', en: 'Hunting the number row by sight.' },
     ],
     practiceText: { bn: 'zebra exit copy very monday 1 2 3 4 5', en: 'zebra exit copy very monday 1 2 3 4 5' },
+    quiz: [
+      {
+        q: { bn: '"B" কী কোন আঙুল দিয়ে চাপা হয়?', en: 'Which finger presses the B key?' },
+        options: [{ bn: 'বাম তর্জনী', en: 'Left index' }, { bn: 'ডান তর্জনী', en: 'Right index' }, { bn: 'বাম কনিকা', en: 'Left pinky' }],
+        answer: 0,
+      },
+    ],
   },
   {
     id: 'en-5', level: 'advanced',
@@ -124,6 +152,18 @@ export const englishLessons: Lesson[] = [
       { bn: 'Caps Lock ভুলে অন রেখে যাওয়া।', en: 'Leaving Caps Lock on by mistake.' },
     ],
     practiceText: { bn: 'Hello, World! Apple? Banana #100 $50', en: 'Hello, World! Apple? Banana #100 $50' },
+    quiz: [
+      {
+        q: { bn: '"!" চিহ্নটি কীভাবে টাইপ করা হয়?', en: 'How do you type the "!" symbol?' },
+        options: [{ bn: 'Shift+1', en: 'Shift+1' }, { bn: 'শুধু 1 কী', en: 'Just the 1 key' }, { bn: 'Shift+`', en: 'Shift+`' }],
+        answer: 0,
+      },
+      {
+        q: { bn: 'ডান হাতের অক্ষরের জন্য কোন Shift ধরতে হয়?', en: 'Which Shift do you hold for a right-hand letter?' },
+        options: [{ bn: 'বাম Shift', en: 'The left Shift' }, { bn: 'ডান Shift', en: 'The right Shift' }, { bn: 'দুটো Shift একসাথে', en: 'Both Shifts together' }],
+        answer: 0,
+      },
+    ],
   },
   {
     id: 'en-6', level: 'professional',
@@ -151,5 +191,16 @@ export const englishLessons: Lesson[] = [
       bn: 'the quick brown fox jumps over the lazy dog. practice makes perfect.',
       en: 'the quick brown fox jumps over the lazy dog. practice makes perfect.',
     },
+    quiz: [
+      {
+        q: { bn: 'F ও J কী-তে ছোট উঁচু দাগ কেন থাকে?', en: 'Why do the F and J keys have small bumps?' },
+        options: [
+          { bn: 'চোখ না ফেরাতে আঙুল হোম রো খুঁজে পায়', en: 'Fingers find the home row without looking' },
+          { bn: 'কী চাপতে সহজ হয়', en: 'They make the keys easier to press' },
+          { bn: 'শুধু ডিজাইনের অংশ, কাজ নেই', en: 'Just decoration — no function' },
+        ],
+        answer: 0,
+      },
+    ],
   },
 ]
