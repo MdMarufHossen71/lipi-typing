@@ -207,6 +207,11 @@ export const en: Record<string, string> = {
   'dashboard.totalTests': 'Total tests',
   'dashboard.bestCpm': 'Best CPM',
   'dashboard.minShort': 'min',
+  'dashboard.speedTrend': 'Speed trend (CPM, last 20 tests)',
+  'dashboard.perMethod': 'Best speed by method (CPM)',
+  'dashboard.activity': 'Last 14 days',
+  'dashboard.activityOlder': '14 days ago',
+  'dashboard.activityToday': 'Today',
 
   // Lesson UI
   'lesson.objectives': 'Learning objectives',
