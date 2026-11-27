@@ -51,7 +51,6 @@ export function TypingTest() {
   const inputEl = useRef<HTMLTextAreaElement>(null)
   const targetRef = useRef('')
   const inputValRef = useRef('')
-  const elapsedRef = useRef(0)
   // "Custom" stores durationSec = 0; the real length is then customMin minutes.
   const effectiveDuration = durationSec === 0 ? customMin * 60 : durationSec
   // Bangla is typed with Avro or Bijoy; English text with the QWERTY layout.
@@ -59,6 +58,12 @@ export function TypingTest() {
     testLang === 'en' ? ['english'] : METHODS.filter((m) => m !== 'english')
 
   const cfgRef = useRef({ testLang, method, mode, durationSec, effectiveDuration })
+  // Wall-clock anchor: elapsed time is derived from Date.now() so a throttled
+  // or background tab (missing interval ticks) cannot make the timer drift.
+  const startedAtRef = useRef(0)
+  // Re-entrancy guard: interval expiry, the target-complete effect and the
+  // Finish button must never save a result twice.
+  const finishedRef = useRef(false)
 
   useEffect(() => {
     cfgRef.current = { testLang, method, mode, durationSec, effectiveDuration }
@@ -69,9 +74,10 @@ export function TypingTest() {
   useEffect(() => {
     inputValRef.current = input
   }, [input])
-  useEffect(() => {
-    elapsedRef.current = elapsed
-  }, [elapsed])
+
+  function readElapsed(): number {
+    return startedAtRef.current > 0 ? (Date.now() - startedAtRef.current) / 1000 : 0
+  }
 
   const isTimed = mode === 'timed'
   const timeLeft = Math.max(0, effectiveDuration - elapsed)
@@ -99,17 +105,15 @@ export function TypingTest() {
     const text = pickText(testLang, mode, effectiveDuration || 120)
     targetRef.current = text
     setTarget(text)
-    setInput('')
-    inputValRef.current = ''
-    setElapsed(0)
-    elapsedRef.current = 0
-    setResult(null)
+    resetRun()
     setPhase('running')
     focusInput()
   }
 
   function finish(elapsedVal: number) {
-    const ev = Math.max(elapsedVal, elapsedRef.current)
+    if (finishedRef.current) return
+    finishedRef.current = true
+    const ev = Math.max(elapsedVal, readElapsed())
     const stats = computeStats(targetRef.current, inputValRef.current, ev)
     const cfg = cfgRef.current
     const saved = saveTestResult({
@@ -133,16 +137,15 @@ export function TypingTest() {
   useEffect(() => {
     if (phase !== 'running') return
     const id = setInterval(() => {
-      setElapsed((e) => {
-        const cfg = cfgRef.current
-        const next = e + 0.2
-        if (cfg.mode === 'timed' && next >= cfg.effectiveDuration) {
-          clearInterval(id)
-          finish(cfg.effectiveDuration)
-          return cfg.effectiveDuration
-        }
-        return next
-      })
+      const cfg = cfgRef.current
+      const current = readElapsed()
+      if (cfg.mode === 'timed' && current >= cfg.effectiveDuration) {
+        // Side effects stay out of setState updaters (StrictMode double-invokes
+        // updaters, which would save twice).
+        finish(cfg.effectiveDuration)
+      } else {
+        setElapsed(current)
+      }
     }, 200)
     return () => clearInterval(id)
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -152,33 +155,36 @@ export function TypingTest() {
     if (phase !== 'running' || !target) return
     const tgCount = segment(target).length
     if (tgCount > 0 && typedCount >= tgCount) {
-      finish(elapsedRef.current)
+      finish(readElapsed())
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [input, phase, target])
 
-  function restart() {
+  function resetRun() {
+    startedAtRef.current = Date.now()
+    finishedRef.current = false
     setInput('')
     inputValRef.current = ''
     setElapsed(0)
-    elapsedRef.current = 0
     setResult(null)
+  }
+
+  function restart() {
+    resetRun()
     setPhase('running')
     focusInput()
   }
 
   function another() {
+    // Timed tests need duration-scaled text — a single paragraph would end the
+    // test almost immediately via the target-complete effect.
     const text =
-      mode === 'fixed' || mode === 'timed'
+      mode === 'fixed'
         ? anotherParagraph(testLang, target)
         : pickText(testLang, mode, effectiveDuration || 120)
     targetRef.current = text
     setTarget(text)
-    setInput('')
-    inputValRef.current = ''
-    setElapsed(0)
-    elapsedRef.current = 0
-    setResult(null)
+    resetRun()
     setPhase('running')
     focusInput()
   }
@@ -317,6 +323,7 @@ export function TypingTest() {
           className="cursor-text rounded-xl border border-slate-200 bg-white p-5 text-lg leading-relaxed shadow-sm dark:border-slate-800 dark:bg-slate-900"
           onClick={focusInput}
           dir="ltr"
+          aria-label={t('test.target')}
         >
           {cmp.map((c, i) => (
             <span
@@ -349,7 +356,7 @@ export function TypingTest() {
         />
 
         <div className="mt-3 flex justify-end">
-          <Button variant="outline" onClick={() => finish(elapsedRef.current)}>
+          <Button variant="outline" onClick={() => finish(readElapsed())}>
             {t('common.finish')}
           </Button>
         </div>

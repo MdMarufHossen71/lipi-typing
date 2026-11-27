@@ -3,7 +3,8 @@ import { CircleCheck } from 'lucide-react'
 import type { Lesson } from '../data/lessons/types'
 import type { TestLang } from '../types'
 import { useI18n } from '../i18n/I18nContext'
-import { isLessonComplete, markLessonComplete } from '../lib/progress'
+import { markLessonComplete } from '../lib/progress'
+import { useCompletedLessonIds } from '../lib/completionStore'
 import { LessonView } from './LessonView'
 import { cn } from '../lib/utils'
 
@@ -12,14 +13,17 @@ interface LessonTrackProps {
   /** Prefix used for completion ids, e.g. "avro" -> "avro:avro-1" */
   trackId: string
   trackLang: TestLang
+  /** Where the sidebar "back" link should lead, e.g. "/learn-bangla". */
+  backTo: string
 }
 
-export function LessonTrack({ lessons, trackId, trackLang }: LessonTrackProps) {
+export function LessonTrack({ lessons, trackId, trackLang, backTo }: LessonTrackProps) {
   const { tr } = useI18n()
   const [idx, setIdx] = useState(0)
   const lesson = lessons[idx]
   const fullId = `${trackId}:${lesson.id}`
-  const completed = isLessonComplete(fullId)
+  const completedIds = useCompletedLessonIds()
+  const completed = completedIds.has(fullId)
 
   return (
     <div className="container-page py-8">
@@ -30,6 +34,7 @@ export function LessonTrack({ lessons, trackId, trackLang }: LessonTrackProps) {
               <button
                 key={l.id}
                 onClick={() => setIdx(i)}
+                aria-current={i === idx ? 'step' : undefined}
                 className={cn(
                   'flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm transition-colors',
                   i === idx
@@ -41,7 +46,7 @@ export function LessonTrack({ lessons, trackId, trackLang }: LessonTrackProps) {
                   <span className="text-xs text-slate-400">{i + 1}</span>
                   <span className="line-clamp-2">{tr(l.title)}</span>
                 </span>
-                {isLessonComplete(`${trackId}:${l.id}`) && (
+                {completedIds.has(`${trackId}:${l.id}`) && (
                   <CircleCheck size={14} className="ml-1 shrink-0 text-emerald-500" />
                 )}
               </button>
@@ -53,6 +58,7 @@ export function LessonTrack({ lessons, trackId, trackLang }: LessonTrackProps) {
             lesson={lesson}
             index={idx}
             total={lessons.length}
+            backTo={backTo}
             onPrev={idx > 0 ? () => setIdx(idx - 1) : undefined}
             onNext={idx < lessons.length - 1 ? () => setIdx(idx + 1) : undefined}
             onComplete={() => markLessonComplete(fullId, trackLang)}

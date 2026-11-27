@@ -4,19 +4,22 @@ import { useI18n } from '../i18n/I18nContext'
 import { Seo } from '../components/Seo'
 import { Button, Card } from '../components/ui'
 import { ProgressRing } from '../components/ProgressRing'
-import { getDashboardStats } from '../lib/progress'
-import { resetAllProgress } from '../lib/progress'
-import { isLessonComplete } from '../lib/progress'
+import {
+  computeDashboardStats,
+  getCompletedLessons,
+  resetAllProgress,
+} from '../lib/progress'
+import { useCompletedLessonIds, useTestHistory } from '../lib/completionStore'
 import { avroLessons } from '../data/lessons/avroLessons'
 import { bijoyLessons } from '../data/lessons/bijoyLessons'
 import { englishLessons } from '../data/lessons/englishLessons'
 import { formatDate, formatDuration, formatNumber } from '../lib/utils'
-import { useState } from 'react'
 
 export default function DashboardPage() {
   const { t, lang } = useI18n()
-  const [tick, setTick] = useState(0)
-  const stats = getDashboardStats()
+  const history = useTestHistory()
+  const completedIds = useCompletedLessonIds()
+  const stats = computeDashboardStats(history, getCompletedLessons())
 
   const tracks = [
     { id: 'avro', lessons: avroLessons, to: '/avro' },
@@ -25,7 +28,7 @@ export default function DashboardPage() {
   ]
   const recommended = tracks
     .flatMap((tr) => tr.lessons.map((l) => ({ tr, l })))
-    .find(({ tr, l }) => !isLessonComplete(`${tr.id}:${l.id}`))
+    .find(({ tr, l }) => !completedIds.has(`${tr.id}:${l.id}`))
 
   if (stats.totalTests === 0 && stats.completedLessons === 0) {
     return (
@@ -54,7 +57,7 @@ export default function DashboardPage() {
   return (
     <>
       <Seo title={`${t('dashboard.title')} — ${t('brand.name')}`} />
-      <div className="container-page py-8" key={tick}>
+      <div className="container-page py-8">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">{t('dashboard.title')}</h1>
@@ -65,7 +68,6 @@ export default function DashboardPage() {
             onClick={() => {
               if (confirm(t('dashboard.resetConfirm'))) {
                 resetAllProgress()
-                setTick((x) => x + 1)
               }
             }}
           >

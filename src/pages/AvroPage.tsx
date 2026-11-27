@@ -137,7 +137,7 @@ export default function AvroPage() {
         <AvroPractice />
       </div>
 
-      <LessonTrack lessons={avroLessons} trackId="avro" trackLang="bn" />
+      <LessonTrack lessons={avroLessons} trackId="avro" trackLang="bn" backTo="/learn-bangla" />
 
       <div className="container-page py-8">
         <AvroReference />

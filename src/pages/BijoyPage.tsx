@@ -24,7 +24,7 @@ export default function BijoyPage() {
         </div>
       </div>
 
-      <LessonTrack lessons={bijoyLessons} trackId="bijoy" trackLang="bn" />
+      <LessonTrack lessons={bijoyLessons} trackId="bijoy" trackLang="bn" backTo="/learn-bangla" />
 
       <div className="container-page py-8">
         <Card>

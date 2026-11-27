@@ -113,3 +113,82 @@ describe('TypingTest configuration', () => {
     }
   })
 })
+
+describe('TypingTest timing and saving', () => {
+  beforeEach(() => localStorage.clear())
+  afterEach(() => {
+    cleanup()
+    vi.useRealTimers()
+  })
+
+  it('derives elapsed time from the wall clock, surviving skipped interval ticks', () => {
+    // Fake Date too, so a suspended/throttled tab can be simulated by jumping
+    // the clock without firing interval callbacks.
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'setInterval', 'clearInterval', 'Date'] })
+    renderTest()
+    fireEvent.click(pill('test.start'))
+
+    // One second passes normally (ticks fire).
+    act(() => {
+      vi.advanceTimersByTime(1000)
+    })
+    // The tab is then throttled: the wall clock moves ~59s but no ticks fire.
+    act(() => {
+      vi.setSystemTime(new Date(Date.now() + 59_000))
+    })
+    // A single tick fires on wake-up and must see the real elapsed time.
+    act(() => {
+      vi.advanceTimersByTime(200)
+    })
+
+    // The 60 s test must have finished with ~60 s elapsed — not ~1.2 s of
+    // accumulated 0.2 s ticks.
+    expect(screen.getByText(bn['test.finished'])).toBeTruthy()
+    const [saved] = readHistory()
+    expect(saved.elapsedSec).toBe(60)
+    expect(saved.durationSec).toBe(60)
+  })
+
+  it('never saves a result twice when the timer expires around a manual finish', () => {
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'setInterval', 'clearInterval', 'Date'] })
+    renderTest()
+    fireEvent.click(pill('test.start'))
+
+    // Nearly the whole duration passes, then the user clicks Finish manually
+    // right as a timer tick would also expire the test.
+    act(() => {
+      vi.advanceTimersByTime(59_900)
+    })
+    fireEvent.click(pill('common.finish'))
+    // A late interval tick lands after the manual finish.
+    act(() => {
+      vi.advanceTimersByTime(300)
+    })
+
+    expect(readHistory().length).toBe(1)
+    expect(screen.getByText(bn['test.finished'])).toBeTruthy()
+  })
+
+  it('builds duration-scaled text for a timed "Another" test', () => {
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'setInterval', 'clearInterval', 'Date'] })
+    renderTest()
+    fireEvent.click(pill('test.start'))
+    // "Another" lives on the finished screen.
+    fireEvent.click(pill('common.finish'))
+    expect(screen.getByText(bn['test.finished'])).toBeTruthy()
+    fireEvent.click(pill('test.another'))
+
+    // 1-minute timed Bangla: pickText targets ~220 CPM + slack (>= 280 chars).
+    // One paragraph alone is ~150 chars, so the old single-paragraph behaviour
+    // would end this test in seconds.
+    const targetText = screen.getByLabelText(bn['test.target'])
+    expect((targetText.textContent ?? '').length).toBeGreaterThanOrEqual(280)
+
+    // And the fresh run must be active again, not instantly finished.
+    act(() => {
+      vi.advanceTimersByTime(2000)
+    })
+    expect(screen.queryByText(bn['test.finished'])).toBeNull()
+    expect(pill('common.finish')).toBeTruthy()
+  })
+})

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { AlertTriangle, ArrowLeft, ArrowRight, Check, CircleCheck, Target } from 'lucide-react'
 import type { Lesson, QuizQ } from '../data/lessons/types'
 import { useI18n } from '../i18n/I18nContext'
-import { compareChars } from '../lib/typingEngine'
+import { compareChars, segment } from '../lib/typingEngine'
 import { Button, Card } from './ui'
 import { cn } from '../lib/utils'
 import { Seo } from './Seo'
@@ -13,7 +13,10 @@ function PracticeBox({ text }: { text: string }) {
   const cmp = compareChars(text, input)
   const correct = cmp.filter((c) => c.state === 'correct').length
   const total = cmp.filter((c) => c.target).length
-  const done = input.length >= cmp.filter((c) => c.target).length && total > 0
+  // Grapheme-based: a Bangla conjunct is one user-perceived character, so a
+  // plain string length would overshoot the target count.
+  const typedCount = segment(input).length
+  const done = typedCount >= total && total > 0
   return (
     <div>
       <div className="rounded-lg bg-slate-50 p-4 text-base leading-relaxed dark:bg-slate-800/50">
@@ -106,6 +109,8 @@ interface LessonViewProps {
   lesson: Lesson
   index: number
   total: number
+  /** Route the back link leads to (e.g. "/learn-bangla"). */
+  backTo: string
   onPrev?: () => void
   onNext?: () => void
   onComplete: () => void
@@ -116,6 +121,7 @@ export function LessonView({
   lesson,
   index,
   total,
+  backTo,
   onPrev,
   onNext,
   onComplete,
@@ -125,7 +131,7 @@ export function LessonView({
   return (
     <div className="container-page py-8">
       <Seo title={`${tr(lesson.title)} — ${t('brand.name')}`} />
-      <Link to=".." className="mb-4 inline-flex items-center gap-1 text-sm text-slate-500 hover:text-brand-600">
+      <Link to={backTo} className="mb-4 inline-flex items-center gap-1 text-sm text-slate-500 hover:text-brand-600">
         <ArrowLeft size={14} /> {t('common.back')}
       </Link>
 

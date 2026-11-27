@@ -12,7 +12,7 @@ export default function EnglishPage() {
         <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">{t('pages.english.title')}</h1>
         <p className="mt-2 max-w-3xl text-slate-600 dark:text-slate-300">{t('pages.english.intro')}</p>
       </div>
-      <LessonTrack lessons={englishLessons} trackId="english" trackLang="en" />
+      <LessonTrack lessons={englishLessons} trackId="english" trackLang="en" backTo="/learn-bangla" />
     </>
   )
 }

@@ -1,21 +1,20 @@
-import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Trash2 } from 'lucide-react'
 import { useI18n } from '../i18n/I18nContext'
 import { Seo } from '../components/Seo'
 import { Button, Card } from '../components/ui'
-import { clearTestHistory, getTestHistory } from '../lib/progress'
+import { clearTestHistory } from '../lib/progress'
+import { useTestHistory } from '../lib/completionStore'
 import { formatDate, formatDuration } from '../lib/utils'
 
 export default function HistoryPage() {
   const { t } = useI18n()
-  const [tick, setTick] = useState(0)
-  const history = getTestHistory()
+  const history = useTestHistory()
 
   return (
     <>
       <Seo title={`${t('pages.history.title')} — ${t('brand.name')}`} />
-      <div className="container-page py-8" key={tick}>
+      <div className="container-page py-8">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">{t('pages.history.title')}</h1>
@@ -27,7 +26,6 @@ export default function HistoryPage() {
               onClick={() => {
                 if (confirm(t('pages.history.clearConfirm'))) {
                   clearTestHistory()
-                  setTick((x) => x + 1)
                 }
               }}
             >

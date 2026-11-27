@@ -18,20 +18,37 @@ export default function InteractiveKeyboardPage() {
   const [showFingers, setShowFingers] = useState(true)
 
   useEffect(() => {
+    // Highlight-only: never preventDefault — Tab must keep moving focus and
+    // Space must keep scrolling. Skip highlight handling while the user is
+    // typing in a text field.
+    const isFormField = (e: KeyboardEvent) => {
+      const el = e.target as HTMLElement | null
+      if (!el) return false
+      return (
+        el.tagName === 'INPUT' ||
+        el.tagName === 'TEXTAREA' ||
+        el.tagName === 'SELECT' ||
+        el.isContentEditable
+      )
+    }
     const down = (e: KeyboardEvent) => {
+      if (isFormField(e)) return
       setShift(e.shiftKey)
       setActiveCode(e.code)
-      if (e.code === 'Space' || e.code === 'Tab') e.preventDefault()
     }
     const up = (e: KeyboardEvent) => {
+      if (isFormField(e)) return
       setShift(e.shiftKey)
       window.setTimeout(() => setActiveCode(undefined), 120)
     }
+    const clear = () => setActiveCode(undefined)
     window.addEventListener('keydown', down)
     window.addEventListener('keyup', up)
+    window.addEventListener('blur', clear)
     return () => {
       window.removeEventListener('keydown', down)
       window.removeEventListener('keyup', up)
+      window.removeEventListener('blur', clear)
     }
   }, [])
 

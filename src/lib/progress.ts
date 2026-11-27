@@ -5,6 +5,19 @@ import { uid } from './utils'
 const HISTORY_KEY = 'test-history'
 const LESSONS_KEY = 'lesson-completions'
 
+// Events dispatched whenever locally stored progress changes, so UI
+// (useSyncExternalStore hooks in completionStore.ts) can re-render live.
+export const HISTORY_EVENT = 'lipi:history-changed'
+export const COMPLETIONS_EVENT = 'lipi:completions-changed'
+
+function notify(event: string): void {
+  try {
+    window.dispatchEvent(new Event(event))
+  } catch {
+    /* non-browser environment */
+  }
+}
+
 export function getTestHistory(): TestResult[] {
   return readJSON<TestResult[]>(HISTORY_KEY, [])
 }
@@ -16,11 +29,13 @@ export function saveTestResult(result: Omit<TestResult, 'id' | 'date'>): TestRes
   // Cap stored history to keep localStorage small on low-end devices.
   const capped = history.slice(0, 200)
   writeJSON(HISTORY_KEY, capped)
+  notify(HISTORY_EVENT)
   return full
 }
 
 export function clearTestHistory(): void {
   removeKey(HISTORY_KEY)
+  notify(HISTORY_EVENT)
 }
 
 export function getCompletedLessons(): LessonCompletion[] {
@@ -36,14 +51,17 @@ export function markLessonComplete(id: string, lang: TestLang): LessonCompletion
   if (!list.some((l) => l.id === id)) {
     list.push({ id, lang, completedAt: new Date().toISOString() })
     writeJSON(LESSONS_KEY, list)
+    notify(COMPLETIONS_EVENT)
   }
   return list
 }
 
 export function getDashboardStats(): DashboardStats {
-  const history = getTestHistory()
-  const completed = getCompletedLessons()
+  return computeDashboardStats(getTestHistory(), getCompletedLessons())
+}
 
+/** Pure stats computation so cloud history can flow through the same logic. */
+export function computeDashboardStats(history: TestResult[], completed: LessonCompletion[]): DashboardStats {
   const totalTests = history.length
   const bestCpm = history.reduce((m, r) => Math.max(m, r.cpm), 0)
   const bestWpm = history.reduce((m, r) => Math.max(m, r.wpm), 0)
@@ -72,4 +90,6 @@ export function getDashboardStats(): DashboardStats {
 export function resetAllProgress(): void {
   removeKey(HISTORY_KEY)
   removeKey(LESSONS_KEY)
+  notify(HISTORY_EVENT)
+  notify(COMPLETIONS_EVENT)
 }
