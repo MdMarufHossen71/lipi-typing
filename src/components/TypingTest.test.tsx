@@ -20,6 +20,11 @@ function readHistory(): TestResult[] {
 }
 
 function pill(key: string) {
+  // Config options render as a radiogroup; action buttons stay plain buttons.
+  return screen.getByRole('radio', { name: bn[key] })
+}
+
+function btn(key: string) {
   return screen.getByRole('button', { name: bn[key] })
 }
 
@@ -32,8 +37,8 @@ describe('TypingTest configuration', () => {
 
   it('offers only Bangla methods for a Bangla test', () => {
     renderTest()
-    expect(pill('test.mAvro').getAttribute('aria-pressed')).toBe('true')
-    expect(pill('test.mBijoy').getAttribute('aria-pressed')).toBe('false')
+    expect(pill('test.mAvro').getAttribute('aria-checked')).toBe('true')
+    expect(pill('test.mBijoy').getAttribute('aria-checked')).toBe('false')
     expect(screen.queryByRole('button', { name: bn['test.mEnglish'] })).toBeNull()
   })
 
@@ -41,7 +46,7 @@ describe('TypingTest configuration', () => {
     renderTest()
     fireEvent.click(pill('common.english'))
 
-    expect(pill('test.mEnglish').getAttribute('aria-pressed')).toBe('true')
+    expect(pill('test.mEnglish').getAttribute('aria-checked')).toBe('true')
     expect(screen.queryByRole('button', { name: bn['test.mAvro'] })).toBeNull()
     expect(screen.queryByRole('button', { name: bn['test.mBijoy'] })).toBeNull()
   })
@@ -50,8 +55,8 @@ describe('TypingTest configuration', () => {
     renderTest()
     fireEvent.click(pill('test.mBijoy'))
 
-    expect(pill('test.mBijoy').getAttribute('aria-pressed')).toBe('true')
-    expect(pill('test.mAvro').getAttribute('aria-pressed')).toBe('false')
+    expect(pill('test.mBijoy').getAttribute('aria-checked')).toBe('true')
+    expect(pill('test.mAvro').getAttribute('aria-checked')).toBe('false')
   })
 
   it('falls back to Avro when switching back from English to Bangla', () => {
@@ -59,15 +64,15 @@ describe('TypingTest configuration', () => {
     fireEvent.click(pill('common.english'))
     fireEvent.click(pill('common.bangla'))
 
-    expect(pill('test.mAvro').getAttribute('aria-pressed')).toBe('true')
-    expect(pill('test.mBijoy').getAttribute('aria-pressed')).toBe('false')
+    expect(pill('test.mAvro').getAttribute('aria-checked')).toBe('true')
+    expect(pill('test.mBijoy').getAttribute('aria-checked')).toBe('false')
   })
 
   it('records a consistent language and method for an English test', () => {
     renderTest()
     fireEvent.click(pill('common.english'))
-    fireEvent.click(pill('test.start'))
-    fireEvent.click(pill('common.finish'))
+    fireEvent.click(btn('test.start'))
+    fireEvent.click(btn('common.finish'))
 
     const [saved] = readHistory()
     expect(saved.lang).toBe('en')
@@ -77,8 +82,8 @@ describe('TypingTest configuration', () => {
   it('records the chosen Bangla method', () => {
     renderTest()
     fireEvent.click(pill('test.mBijoy'))
-    fireEvent.click(pill('test.start'))
-    fireEvent.click(pill('common.finish'))
+    fireEvent.click(btn('test.start'))
+    fireEvent.click(btn('common.finish'))
 
     const [saved] = readHistory()
     expect(saved.lang).toBe('bn')
@@ -90,13 +95,13 @@ describe('TypingTest configuration', () => {
     try {
       renderTest()
       fireEvent.click(pill('test.dCustom'))
-      fireEvent.click(pill('test.start'))
+      fireEvent.click(btn('test.start'))
 
       // The custom length defaults to 5 minutes, so an early tick must not end it.
       act(() => {
         vi.advanceTimersByTime(1000)
       })
-      expect(pill('common.finish')).toBeTruthy()
+      expect(btn('common.finish')).toBeTruthy()
       expect(screen.queryByText(bn['test.finished'])).toBeNull()
 
       // A little over 5 minutes, so float rounding of the 0.2 s ticks cannot matter.
@@ -126,7 +131,7 @@ describe('TypingTest timing and saving', () => {
     // the clock without firing interval callbacks.
     vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'setInterval', 'clearInterval', 'Date'] })
     renderTest()
-    fireEvent.click(pill('test.start'))
+    fireEvent.click(btn('test.start'))
 
     // One second passes normally (ticks fire).
     act(() => {
@@ -152,14 +157,14 @@ describe('TypingTest timing and saving', () => {
   it('never saves a result twice when the timer expires around a manual finish', () => {
     vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'setInterval', 'clearInterval', 'Date'] })
     renderTest()
-    fireEvent.click(pill('test.start'))
+    fireEvent.click(btn('test.start'))
 
     // Nearly the whole duration passes, then the user clicks Finish manually
     // right as a timer tick would also expire the test.
     act(() => {
       vi.advanceTimersByTime(59_900)
     })
-    fireEvent.click(pill('common.finish'))
+    fireEvent.click(btn('common.finish'))
     // A late interval tick lands after the manual finish.
     act(() => {
       vi.advanceTimersByTime(300)
@@ -172,11 +177,11 @@ describe('TypingTest timing and saving', () => {
   it('builds duration-scaled text for a timed "Another" test', () => {
     vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'setInterval', 'clearInterval', 'Date'] })
     renderTest()
-    fireEvent.click(pill('test.start'))
+    fireEvent.click(btn('test.start'))
     // "Another" lives on the finished screen.
-    fireEvent.click(pill('common.finish'))
+    fireEvent.click(btn('common.finish'))
     expect(screen.getByText(bn['test.finished'])).toBeTruthy()
-    fireEvent.click(pill('test.another'))
+    fireEvent.click(btn('test.another'))
 
     // 1-minute timed Bangla: pickText targets ~220 CPM + slack (>= 280 chars).
     // One paragraph alone is ~150 chars, so the old single-paragraph behaviour
@@ -189,6 +194,6 @@ describe('TypingTest timing and saving', () => {
       vi.advanceTimersByTime(2000)
     })
     expect(screen.queryByText(bn['test.finished'])).toBeNull()
-    expect(pill('common.finish')).toBeTruthy()
+    expect(btn('common.finish')).toBeTruthy()
   })
 })

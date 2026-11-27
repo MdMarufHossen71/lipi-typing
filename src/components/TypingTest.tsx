@@ -16,7 +16,7 @@ import { useI18n } from '../i18n/I18nContext'
 import { compareChars, computeStats, performanceLevel, segment } from '../lib/typingEngine'
 import { anotherParagraph, pickText } from '../data/testTexts'
 import { saveTestResult } from '../lib/progress'
-import { Button, Card } from './ui'
+import { Button, Card, SegmentedControl } from './ui'
 import { ProgressRing } from './ProgressRing'
 import { cn, formatDuration, formatNumber } from '../lib/utils'
 import { Seo } from './Seo'
@@ -225,23 +225,25 @@ export function TypingTest() {
         <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">{t('test.title')}</h1>
         <p className="mt-2 text-slate-500 dark:text-slate-400">{t('test.subtitle')}</p>
 
-        <Card className="mt-6 space-y-5">
+        <Card className="mt-6 space-y-6">
           <Field label={t('test.language')}>
-            <Pills
+            <SegmentedControl
               value={testLang}
+              ariaLabel={t('test.language')}
               options={[
-                { v: 'bn', label: t('common.bangla') },
-                { v: 'en', label: t('common.english') },
+                { value: 'bn', label: t('common.bangla') },
+                { value: 'en', label: t('common.english') },
               ]}
               onChange={pickTestLang}
             />
           </Field>
 
           <Field label={t('test.method')}>
-            <Pills
+            <SegmentedControl
               value={method}
+              ariaLabel={t('test.method')}
               options={methodOptions.map((m) => ({
-                v: m,
+                value: m,
                 label: m === 'avro' ? t('test.mAvro') : m === 'bijoy' ? t('test.mBijoy') : t('test.mEnglish'),
               }))}
               onChange={(v) => setMethod(v as TypingMethod)}
@@ -250,10 +252,11 @@ export function TypingTest() {
           </Field>
 
           <Field label={t('test.mode')}>
-            <Pills
+            <SegmentedControl
               value={mode}
+              ariaLabel={t('test.mode')}
               options={MODES.map((m) => ({
-                v: m,
+                value: m,
                 label: t(
                   m === 'timed' ? 'test.modeTimed'
                     : m === 'fixed' ? 'test.modeFixed'
@@ -269,18 +272,22 @@ export function TypingTest() {
 
           {isTimed && (
             <Field label={t('test.duration')}>
-              <Pills
+              <SegmentedControl
                 value={String(durationSec)}
+                ariaLabel={t('test.duration')}
                 options={[
-                  ...DURATIONS.map((d) => ({ v: String(d), label: formatDuration(d) })),
-                  { v: '0', label: t('test.dCustom') },
+                  ...DURATIONS.map((d) => ({ value: String(d), label: formatDuration(d) })),
+                  { value: '0', label: t('test.dCustom') },
                 ]}
                 onChange={(v) => setDurationSec(Number(v))}
               />
               {durationSec === 0 && (
-                <div className="mt-2 flex items-center gap-2">
-                  <label className="text-sm text-slate-500">{t('test.customMin')}</label>
+                <div className="mt-3 flex items-center gap-2">
+                  <label htmlFor="custom-minutes" className="text-sm text-slate-500 dark:text-slate-400">
+                    {t('test.customMin')}
+                  </label>
                   <input
+                    id="custom-minutes"
                     type="number"
                     min={1}
                     max={60}
@@ -300,7 +307,7 @@ export function TypingTest() {
         </Card>
 
         {testLang === 'bn' && (
-          <p className="mt-4 rounded-lg bg-brand-50 p-3 text-xs text-brand-800 dark:bg-brand-900/30 dark:text-brand-200">
+          <p className="mt-4 rounded-xl bg-brand-50 p-3 text-xs text-brand-800 dark:bg-brand-900/30 dark:text-brand-200">
             {t('test.banglaCpmNote')}
           </p>
         )}
@@ -312,11 +319,13 @@ export function TypingTest() {
     const progress = isTimed ? (elapsed / effectiveDuration) * 100 : (typedCount / Math.max(1, segment(target).length)) * 100
     return (
       <div className="container-page py-6">
-        <div className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <Stat icon={<Timer size={16} />} label={isTimed ? t('test.timeLeft') : t('test.progress')} value={isTimed ? formatDuration(timeLeft) : `${Math.round(progress)}%`} />
-          <Stat icon={<Gauge size={16} />} label={t('test.cpm')} value={formatNumber(live.cpm)} />
-          <Stat icon={<Gauge size={16} />} label={t('test.wpm')} value={formatNumber(live.wpm)} />
-          <Stat icon={<Target size={16} />} label={t('test.accuracy')} value={`${Math.round(live.accuracy)}%`} />
+        <div className="sticky top-14 z-10 -mx-4 mb-4 rounded-2xl border border-slate-200 bg-white/90 px-4 py-3 backdrop-blur dark:border-slate-800 dark:bg-slate-900/90 sm:mx-0">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <Stat icon={<Timer size={16} />} label={isTimed ? t('test.timeLeft') : t('test.progress')} value={isTimed ? formatDuration(timeLeft) : `${Math.round(progress)}%`} />
+            <Stat icon={<Gauge size={16} />} label={t('test.cpm')} value={formatNumber(live.cpm)} />
+            <Stat icon={<Gauge size={16} />} label={t('test.wpm')} value={formatNumber(live.wpm)} />
+            <Stat icon={<Target size={16} />} label={t('test.accuracy')} value={`${Math.round(live.accuracy)}%`} />
+          </div>
         </div>
 
         <div
@@ -415,38 +424,8 @@ export function TypingTest() {
 function Field({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div>
-      <div className="mb-2 text-sm font-medium text-slate-700 dark:text-slate-300">{label}</div>
+      <div className="label">{label}</div>
       {children}
-    </div>
-  )
-}
-
-function Pills({
-  value,
-  options,
-  onChange,
-}: {
-  value: string
-  options: { v: string; label: string }[]
-  onChange: (v: string) => void
-}) {
-  return (
-    <div className="flex flex-wrap gap-2">
-      {options.map((o) => (
-        <button
-          key={o.v}
-          onClick={() => onChange(o.v)}
-          aria-pressed={value === o.v}
-          className={cn(
-            'rounded-lg border px-3 py-1.5 text-sm transition-colors',
-            value === o.v
-              ? 'border-brand-500 bg-brand-50 text-brand-700 dark:bg-brand-900/30 dark:text-brand-200'
-              : 'border-slate-200 text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800',
-          )}
-        >
-          {o.label}
-        </button>
-      ))}
     </div>
   )
 }
@@ -463,9 +442,9 @@ function Stat({
   big?: boolean
 }) {
   return (
-    <div className="rounded-lg border border-slate-200 bg-white p-3 dark:border-slate-800 dark:bg-slate-900">
-      <div className="flex items-center gap-1 text-xs text-slate-500">{icon} {label}</div>
-      <div className={cn('mt-1 font-bold', big ? 'text-2xl' : 'text-lg')}>{value}</div>
+    <div className="rounded-xl border border-slate-200 bg-white p-3 dark:border-slate-800 dark:bg-slate-900">
+      <div className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400">{icon} {label}</div>
+      <div className={cn('mt-1 font-bold tabular-nums', big ? 'text-2xl' : 'text-lg')}>{value}</div>
     </div>
   )
 }

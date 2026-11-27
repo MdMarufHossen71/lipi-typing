@@ -5,7 +5,6 @@ import { I18nProvider } from '../i18n/I18nContext'
 import { bn } from '../i18n/bn'
 import type { Lesson } from '../data/lessons/types'
 import { LessonView } from './LessonView'
-
 const fixture: Lesson = {
   id: 'test-1',
   level: 'beginner',
@@ -41,15 +40,16 @@ describe('LessonView practice box', () => {
   it('counts Bangla graphemes, not UTF-16 units, for the done check', () => {
     renderView()
     const input = screen.getByLabelText('Practice input')
+    const doneLabel = bn['lesson.practiceDone']
 
     // "ক্ষ" is one grapheme but 3 UTF-16 units; the target "ক্ষত" is 2 graphemes.
     // The old input.length check declared done here prematurely.
     fireEvent.change(input, { target: { value: 'ক্ষ' } })
-    expect(screen.queryByText('2/2 · ✓')).toBeNull()
+    expect(screen.queryByText(doneLabel)).toBeNull()
 
     // Completing both graphemes marks the practice done.
     fireEvent.change(input, { target: { value: 'ক্ষত' } })
-    expect(screen.getByText('2/2 · ✓')).toBeTruthy()
+    expect(screen.getByText(doneLabel)).toBeTruthy()
   })
 
   it('links back to the configured track route, not the homepage', () => {
